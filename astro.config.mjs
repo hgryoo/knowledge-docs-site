@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import rehypeMermaidPre from './src/lib/rehype-mermaid-pre.mjs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -25,6 +26,14 @@ export default defineConfig({
         allow: [here, kbRepo, slidesRepo],
       },
     },
+  },
+  markdown: {
+    // Rewrite ```mermaid fences to `<pre class="mermaid">…</pre>` markers;
+    // the script registered in starlight({head}) loads mermaid.js from a
+    // CDN and renders every block in the browser. No playwright/headless
+    // chrome at build time.
+    syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid'] },
+    rehypePlugins: [rehypeMermaidPre],
   },
   integrations: [
     starlight({
@@ -67,6 +76,21 @@ export default defineConfig({
         },
       ],
       customCss: ['./src/styles/custom.css'],
+      head: [
+        {
+          tag: 'script',
+          attrs: { type: 'module' },
+          content: `
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+            const isDark = document.documentElement.dataset.theme !== 'light';
+            mermaid.initialize({
+              startOnLoad: true,
+              theme: isDark ? 'dark' : 'default',
+              securityLevel: 'loose',
+            });
+          `,
+        },
+      ],
     }),
   ],
 });
