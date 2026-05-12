@@ -82,9 +82,13 @@
   font-size: 1.25rem;
 }
 
-/* Slightly tighter prose width — long analysis docs read better narrower. */
+/* Generous prose width — analysis docs have wide mermaid diagrams,
+ * tables, and code blocks that need room. */
+:root {
+  --sl-content-width: 80rem;
+}
+
 .sl-markdown-content {
-  --sl-content-width: 50rem;
   font-size: 16px;
   line-height: 1.7;
 }
@@ -147,4 +151,86 @@
 
 .kb-decks {
   margin: 2rem 0;
+}
+
+/* Mermaid diagrams — click to open in lightbox with pan/zoom. */
+pre.mermaid {
+  margin: 1.5rem 0;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+pre.mermaid.mermaid-zoomable {
+  cursor: zoom-in;
+  transition: border-color 0.15s ease;
+}
+
+pre.mermaid.mermaid-zoomable:hover {
+  border-color: var(--sl-color-accent);
+}
+
+.mermaid-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 48px 24px 24px;
+}
+
+.mermaid-lightbox__stage {
+  flex: 1;
+  background: var(--sl-color-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+}
+
+.mermaid-lightbox__stage svg {
+  display: block;
+  /* transform set inline; keep starting from top-left of stage */
+}
+
+.mermaid-lightbox__close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-white);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.mermaid-lightbox__close:hover {
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-accent);
+}
+
+.mermaid-lightbox__hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--sl-font);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 14px;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 2;
+  letter-spacing: 0.02em;
 }
