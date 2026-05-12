@@ -71,6 +71,10 @@ jobs:
         run: bash prebuild.sh
 
       - name: Build site
+        env:
+          # Deployed at hgryoo.dev/knowledge-docs-site/.
+          SITE_BASE: /knowledge-docs-site
+          SITE_URL: https://hgryoo.dev/knowledge-docs-site
         run: npx astro build
 
       - name: Upload artifact

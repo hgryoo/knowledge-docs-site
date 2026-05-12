@@ -7,8 +7,15 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const kbRepo = path.resolve(here, '../knowledge-base');
 const slidesRepo = path.resolve(here, '../knowledge-slides');
 
+// Deployed to a GitHub Pages subpath (hgryoo.dev/knowledge-docs-site/).
+// The CI workflow sets SITE_BASE and SITE_URL; locally we default to
+// root so `npm run dev` keeps working at http://localhost:9998/.
+const siteBase = process.env.SITE_BASE || '';
+const siteUrl = process.env.SITE_URL || `http://localhost:9998${siteBase}`;
+
 export default defineConfig({
-  site: 'http://localhost:9998',
+  site: siteUrl,
+  base: siteBase || undefined,
   server: { host: '0.0.0.0', port: 9998 },
   vite: {
     server: {

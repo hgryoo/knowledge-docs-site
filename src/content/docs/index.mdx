@@ -6,11 +6,11 @@ hero:
   tagline: Long-form notes, code analyses, and references. Mostly DBMS internals — written while reading source and re-deriving designs from first principles.
   actions:
     - text: Browse code analysis
-      link: /code-analysis/
+      link: code-analysis/
       icon: right-arrow
       variant: primary
     - text: View slides
-      link: /slides/
+      link: slides/
       icon: external
 ---
 
@@ -33,22 +33,22 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   <LinkCard
     title="CUBRID Lock Manager"
     description="Multi-granularity locking, mode conversion, waits-for-graph deadlock detection."
-    href="/code-analysis/cubrid/cubrid-lock-manager/"
+    href="code-analysis/cubrid/cubrid-lock-manager/"
   />
   <LinkCard
     title="CUBRID MVCC"
     description="Snapshot isolation realized on top of OID-shaped rows."
-    href="/code-analysis/cubrid/cubrid-mvcc/"
+    href="code-analysis/cubrid/cubrid-mvcc/"
   />
   <LinkCard
     title="Recovery Manager"
     description="ARIES-style WAL, analysis/redo/undo, checkpoints."
-    href="/code-analysis/cubrid/cubrid-recovery-manager/"
+    href="code-analysis/cubrid/cubrid-recovery-manager/"
   />
   <LinkCard
     title="Architecture Overview"
     description="A top-down map of the codebase before the deep dives."
-    href="/code-analysis/cubrid/cubrid-architecture-overview/"
+    href="code-analysis/cubrid/cubrid-architecture-overview/"
   />
 </CardGrid>
 
@@ -56,9 +56,9 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <CardGrid>
   <Card title="Code Analysis" icon="document">
-    Per-module CUBRID deep dives. [Open the catalog →](/code-analysis/)
+    Per-module CUBRID deep dives. [Open the catalog →](code-analysis/)
   </Card>
   <Card title="Slides" icon="seti:powerpoint">
-    Talks and notes built from these analyses. [Open the deck list →](/slides/)
+    Talks and notes built from these analyses. [Open the deck list →](slides/)
   </Card>
 </CardGrid>
