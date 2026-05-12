@@ -36,7 +36,11 @@ export type Deck = {
   available: boolean;
 };
 
-const STANDALONE_BASE = 'http://localhost:9999';
+// Where the standalone knowledge-slides-site is reachable. Override via
+// env var; default to localhost:9999 for `npm run dev`. CI deploys set
+// this to the prod URL so deck-card links work after build.
+const STANDALONE_BASE =
+  process.env.STANDALONE_BASE ?? 'http://localhost:9999';
 
 function distExists(file: string): boolean {
   try {

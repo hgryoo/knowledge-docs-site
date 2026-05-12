@@ -79,6 +79,9 @@ jobs:
           # site source under the runner workspace, NOT three levels up
           # as on a local sibling-clone layout. Tell src/lib/decks.ts.
           SLIDES_REPO: ${{ github.workspace }}/knowledge-slides
+          # In-site /slides/ deck cards link out to the standalone
+          # knowledge-slides-site for the actual HTML/PDF assets.
+          STANDALONE_BASE: https://hgryoo.dev/knowledge-slides-site
         run: npx astro build
 
       - name: Upload artifact
