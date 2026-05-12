@@ -3,18 +3,23 @@ title: hgryoo · Docs
 description: Long-form notes, code analyses, and references.
 template: splash
 hero:
-  tagline: Long-form notes, code analyses, and references. Mostly DBMS internals — written while reading source and re-deriving designs from first principles.
+  tagline: Notes on database internals and code analysis, mostly centered on CUBRID. Storage, MVCC, lock manager, and similar core modules at a line-by-line level.
   actions:
     - text: Browse code analysis
       link: code-analysis/
       icon: right-arrow
       variant: primary
+    - text: Open knowledge-base-site ↗
+      link: https://hgryoo.dev/knowledge-base-site/
+      icon: external
+      variant: secondary
     - text: View slides
       link: slides/
       icon: external
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import CodeAnalysisIndex from '../../components/CodeAnalysisIndex.astro';
 
 <div class="kb-landing">
   <p class="kb-eyebrow"><span class="kb-rule"></span>Hyunggyu Ryoo · Docs</p>
@@ -22,43 +27,32 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   <p class="kb-lede">
     Long-form analyses of database-system internals, technical references,
     and reading notes. Written while reading source and re-deriving designs
-    from first principles. Currently focused on CUBRID — lock manager, MVCC,
-    recovery, storage layer — with more sections to follow.
+    from first principles. Mostly CUBRID — lock manager, MVCC, recovery,
+    storage layer — with more sections to follow.
   </p>
 </div>
 
-## Featured
+<LinkCard
+  title="Full knowledge base ↗"
+  description="Wiki/graph view with research notes, methodology playbooks, and the rest of the kb beyond the published analyses below. Hosted on Quartz."
+  href="https://hgryoo.dev/knowledge-base-site/"
+/>
+
+## Categories
+
+### [code-analysis](code-analysis/)
+
+Open-source DBMS internals — currently a line-by-line read of the CUBRID
+codebase, broken down by storage, MVCC, lock manager, and the layers around
+them.
+
+<CodeAnalysisIndex lang="en" />
+
+## Slides
 
 <CardGrid>
-  <LinkCard
-    title="CUBRID Lock Manager"
-    description="Multi-granularity locking, mode conversion, waits-for-graph deadlock detection."
-    href="code-analysis/cubrid/cubrid-lock-manager/"
-  />
-  <LinkCard
-    title="CUBRID MVCC"
-    description="Snapshot isolation realized on top of OID-shaped rows."
-    href="code-analysis/cubrid/cubrid-mvcc/"
-  />
-  <LinkCard
-    title="Recovery Manager"
-    description="ARIES-style WAL, analysis/redo/undo, checkpoints."
-    href="code-analysis/cubrid/cubrid-recovery-manager/"
-  />
-  <LinkCard
-    title="Architecture Overview"
-    description="A top-down map of the codebase before the deep dives."
-    href="code-analysis/cubrid/cubrid-architecture-overview/"
-  />
-</CardGrid>
-
-## Browse
-
-<CardGrid>
-  <Card title="Code Analysis" icon="document">
-    Per-module CUBRID deep dives. [Open the catalog →](code-analysis/)
-  </Card>
-  <Card title="Slides" icon="seti:powerpoint">
-    Talks and notes built from these analyses. [Open the deck list →](slides/)
+  <Card title="Talks & notes built from these analyses" icon="seti:powerpoint">
+    Decks that distill the per-module deep dives below.
+    [Open the deck list →](slides/)
   </Card>
 </CardGrid>

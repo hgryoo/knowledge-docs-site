@@ -3,18 +3,23 @@ title: hgryoo · Docs
 description: 장문 노트, 코드 분석, 그리고 레퍼런스.
 template: splash
 hero:
-  tagline: 장문 노트, 코드 분석, 그리고 레퍼런스. 주로 DBMS 내부 — 코드를 읽으면서 설계를 원리에서부터 재구성하며 쓴 글들.
+  tagline: 데이터베이스 내부와 코드 분석에 대한 노트. 주로 CUBRID — 스토리지, MVCC, 락 매니저 등 핵심 모듈을 코드 단위로 따라간다.
   actions:
     - text: 코드 분석 둘러보기
       link: code-analysis/
       icon: right-arrow
       variant: primary
+    - text: knowledge-base-site 열기 ↗
+      link: https://hgryoo.dev/knowledge-base-site/
+      icon: external
+      variant: secondary
     - text: 발표 자료 보기
       link: slides/
       icon: external
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import CodeAnalysisIndex from '../../../components/CodeAnalysisIndex.astro';
 
 <div class="kb-landing">
   <p class="kb-eyebrow"><span class="kb-rule"></span>류형규 · Docs</p>
@@ -22,43 +27,29 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   <p class="kb-lede">
     데이터베이스 내부 구조 분석서, 기술 레퍼런스, 그리고 읽기 노트. 코드를
     읽으면서, 설계를 원리에서부터 재구성하면서 쓴 글입니다. 현재는 CUBRID —
-    락 매니저, MVCC, 복구, 스토리지 계층 — 가 중심이고, 다른 섹션은 차차
-    추가됩니다.
+    락 매니저, MVCC, 복구, 스토리지 계층 — 가 중심.
   </p>
 </div>
 
-## 추천
+<LinkCard
+  title="전체 knowledge-base ↗"
+  description="위키/그래프 뷰. 아래 공개된 분석서 외의 research, methodology 플레이북 등이 함께 묶여 있는 Quartz 사이트."
+  href="https://hgryoo.dev/knowledge-base-site/"
+/>
+
+## 카테고리
+
+### [code-analysis](code-analysis/)
+
+오픈소스 DBMS 내부 — 현재는 CUBRID 코드베이스의 line-by-line 읽기. 스토리지,
+MVCC, 락 매니저, 그리고 그 주변 계층 단위로 분류.
+
+<CodeAnalysisIndex lang="ko" />
+
+## 발표 자료
 
 <CardGrid>
-  <LinkCard
-    title="CUBRID Lock Manager"
-    description="다중 단위 잠금, 모드 변환, 데드락 탐지."
-    href="code-analysis/cubrid/cubrid-lock-manager/"
-  />
-  <LinkCard
-    title="CUBRID MVCC"
-    description="스냅샷 생성, 활성 MVCCID 추적, vacuum 협조."
-    href="code-analysis/cubrid/cubrid-mvcc/"
-  />
-  <LinkCard
-    title="Recovery Manager"
-    description="ARIES 세 패스 재시작."
-    href="code-analysis/cubrid/cubrid-recovery-manager/"
-  />
-  <LinkCard
-    title="아키텍처 개요"
-    description="프로세스 모델, 계층 스택, 세부 문서로 가는 지도."
-    href="code-analysis/cubrid/cubrid-architecture-overview/"
-  />
-</CardGrid>
-
-## 둘러보기
-
-<CardGrid>
-  <Card title="코드 분석" icon="document">
-    CUBRID 모듈별 분석서. [카탈로그 열기 →](code-analysis/)
-  </Card>
-  <Card title="발표 자료" icon="seti:powerpoint">
-    분석서에서 파생된 발표 슬라이드. [데크 목록 →](slides/)
+  <Card title="분석서에서 파생된 발표 슬라이드" icon="seti:powerpoint">
+    아래 모듈별 딥다이브를 요약한 데크. [데크 목록 →](slides/)
   </Card>
 </CardGrid>
