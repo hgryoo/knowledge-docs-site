@@ -9,17 +9,10 @@ hero:
       link: code-analysis/
       icon: right-arrow
       variant: primary
-    - text: Open knowledge-base-site ↗
-      link: https://hgryoo.dev/knowledge-base-site/
-      icon: external
-      variant: secondary
     - text: View slides
       link: slides/
       icon: external
 ---
-
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
-import CodeAnalysisIndex from '../../components/CodeAnalysisIndex.astro';
 
 <div class="kb-landing">
   <p class="kb-eyebrow"><span class="kb-rule"></span>Hyunggyu Ryoo · Docs</p>
@@ -31,28 +24,3 @@ import CodeAnalysisIndex from '../../components/CodeAnalysisIndex.astro';
     storage layer — with more sections to follow.
   </p>
 </div>
-
-<LinkCard
-  title="Full knowledge base ↗"
-  description="Wiki/graph view with research notes, methodology playbooks, and the rest of the kb beyond the published analyses below. Hosted on Quartz."
-  href="https://hgryoo.dev/knowledge-base-site/"
-/>
-
-## Categories
-
-### [code-analysis](code-analysis/)
-
-Open-source DBMS internals — currently a line-by-line read of the CUBRID
-codebase, broken down by storage, MVCC, lock manager, and the layers around
-them.
-
-<CodeAnalysisIndex lang="en" />
-
-## Slides
-
-<CardGrid>
-  <Card title="Talks & notes built from these analyses" icon="seti:powerpoint">
-    Decks that distill the per-module deep dives below.
-    [Open the deck list →](slides/)
-  </Card>
-</CardGrid>

@@ -9,17 +9,10 @@ hero:
       link: code-analysis/
       icon: right-arrow
       variant: primary
-    - text: knowledge-base-site 열기 ↗
-      link: https://hgryoo.dev/knowledge-base-site/
-      icon: external
-      variant: secondary
     - text: 발표 자료 보기
       link: slides/
       icon: external
 ---
-
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
-import CodeAnalysisIndex from '../../../components/CodeAnalysisIndex.astro';
 
 <div class="kb-landing">
   <p class="kb-eyebrow"><span class="kb-rule"></span>류형규 · Docs</p>
@@ -30,26 +23,3 @@ import CodeAnalysisIndex from '../../../components/CodeAnalysisIndex.astro';
     락 매니저, MVCC, 복구, 스토리지 계층 — 가 중심.
   </p>
 </div>
-
-<LinkCard
-  title="전체 knowledge-base ↗"
-  description="위키/그래프 뷰. 아래 공개된 분석서 외의 research, methodology 플레이북 등이 함께 묶여 있는 Quartz 사이트."
-  href="https://hgryoo.dev/knowledge-base-site/"
-/>
-
-## 카테고리
-
-### [code-analysis](code-analysis/)
-
-오픈소스 DBMS 내부 — 현재는 CUBRID 코드베이스의 line-by-line 읽기. 스토리지,
-MVCC, 락 매니저, 그리고 그 주변 계층 단위로 분류.
-
-<CodeAnalysisIndex lang="ko" />
-
-## 발표 자료
-
-<CardGrid>
-  <Card title="분석서에서 파생된 발표 슬라이드" icon="seti:powerpoint">
-    아래 모듈별 딥다이브를 요약한 데크. [데크 목록 →](slides/)
-  </Card>
-</CardGrid>

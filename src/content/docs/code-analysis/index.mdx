@@ -1,57 +1,12 @@
 ---
 title: Code Analysis
-description: Per-module deep dives into CUBRID's internals.
+description: Module-by-module deep dives into CUBRID's internals.
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import CodeAnalysisIndex from '../../../components/CodeAnalysisIndex.astro';
 
-A catalog of module-level analyses of CUBRID — read alongside the source.
-The sidebar lists every module; below are reading orders by topic if you want
-a guided path.
+Open-source DBMS internals — currently a line-by-line read of the CUBRID
+codebase, broken down by storage, MVCC, lock manager, and the layers around
+them.
 
-## Where to start
-
-<CardGrid>
-  <LinkCard
-    title="Architecture Overview"
-    description="Top-down map of the codebase before the per-module deep dives."
-    href="cubrid/cubrid-architecture-overview/"
-  />
-  <LinkCard
-    title="Lock Manager"
-    description="Multi-granularity locking + waits-for-graph deadlock detection."
-    href="cubrid/cubrid-lock-manager/"
-  />
-</CardGrid>
-
-## Reading paths
-
-### Transactions & Recovery
-
-- [Transaction](cubrid/cubrid-transaction/)
-- [Lock Manager](cubrid/cubrid-lock-manager/)
-- [MVCC](cubrid/cubrid-mvcc/)
-- [Log Manager](cubrid/cubrid-log-manager/)
-- [Recovery Manager](cubrid/cubrid-recovery-manager/)
-- [Checkpoint](cubrid/cubrid-checkpoint/)
-- [Vacuum](cubrid/cubrid-vacuum/)
-- [Two-Phase Commit](cubrid/cubrid-2pc/)
-
-### Storage engine
-
-- [Disk Manager](cubrid/cubrid-disk-manager/)
-- [Page Buffer Manager](cubrid/cubrid-page-buffer-manager/)
-- [Heap Manager](cubrid/cubrid-heap-manager/)
-- [B-tree](cubrid/cubrid-btree/)
-- [Extendible Hash](cubrid/cubrid-extendible-hash/)
-- [Overflow File](cubrid/cubrid-overflow-file/)
-
-### Query processing
-
-- [Parser](cubrid/cubrid-parser/)
-- [Semantic Check](cubrid/cubrid-semantic-check/)
-- [Query Optimizer](cubrid/cubrid-query-optimizer/)
-- [XASL Generator](cubrid/cubrid-xasl-generator/)
-- [Query Executor](cubrid/cubrid-query-executor/)
-- [Scan Manager](cubrid/cubrid-scan-manager/)
-- [Parallel Query](cubrid/cubrid-parallel-query/)
+<CodeAnalysisIndex />

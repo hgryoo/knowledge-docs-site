@@ -5,12 +5,6 @@ import { getCollection } from 'astro:content';
 // reads frontmatter from every code-analysis/cubrid/*.md, groups by
 // `subcategory:`, and emits a jumplist + per-subcategory bullet list.
 
-interface Props {
-  lang: 'en' | 'ko';
-}
-
-const { lang } = Astro.props;
-
 type SubcatSlug =
   | 'overview'
   | 'base-infra'
@@ -23,64 +17,51 @@ type SubcatSlug =
   | 'server-architecture'
   | 'i18n-specialty';
 
-const ORDER: Array<[SubcatSlug, string, string]> = [
-  ['overview',            'Overview & Reading Paths',         '개요 & 읽기 경로'],
-  ['base-infra',          'Base / Infrastructure',            '기본 / 인프라'],
-  ['storage-engine',      'Storage Engine',                   '스토리지 엔진'],
-  ['txn-recovery',        'Transaction & Recovery',           '트랜잭션 & 복구'],
-  ['query-processing',    'Query Processing',                 '질의 처리'],
-  ['ddl-schema',          'DDL & Schema',                     'DDL & 스키마'],
-  ['replication-ha',      'Replication & HA',                 '복제 & HA'],
-  ['pl-language',         'Procedural Language',              '프로시저 언어'],
-  ['server-architecture', 'Server Architecture',              '서버 아키텍처'],
-  ['i18n-specialty',      'Internationalization & Specialty', '국제화 & 특수'],
+const ORDER: Array<[SubcatSlug, string]> = [
+  ['overview',            'Overview & Reading Paths'],
+  ['base-infra',          'Base / Infrastructure'],
+  ['storage-engine',      'Storage Engine'],
+  ['txn-recovery',        'Transaction & Recovery'],
+  ['query-processing',    'Query Processing'],
+  ['ddl-schema',          'DDL & Schema'],
+  ['replication-ha',      'Replication & HA'],
+  ['pl-language',         'Procedural Language'],
+  ['server-architecture', 'Server Architecture'],
+  ['i18n-specialty',      'Internationalization & Specialty'],
 ];
 
 const all = await getCollection('docs');
-const enPrefix = 'code-analysis/cubrid/';
-const koPrefix = 'ko/code-analysis/cubrid/';
+const prefix = 'code-analysis/cubrid/';
 
 type Entry = {
-  slug: string;        // e.g. "cubrid-lock-manager"
+  slug: string;
   title: string;
   summary?: string;
   subcategory?: string;
 };
 
-function collect(prefix: string): Map<string, Entry> {
-  const m = new Map<string, Entry>();
-  for (const e of all) {
-    if (!e.id.startsWith(prefix)) continue;
-    if (prefix === enPrefix && e.id.startsWith(koPrefix)) continue;
-    const slug = e.id.slice(prefix.length);
-    if (!slug || slug.includes('/')) continue; // top-level docs only
-    m.set(slug, {
-      slug,
-      title: (e.data as any).title ?? slug,
-      summary: (e.data as any).summary,
-      subcategory: (e.data as any).subcategory,
-    });
-  }
-  return m;
+const entries: Entry[] = [];
+for (const e of all) {
+  if (!e.id.startsWith(prefix)) continue;
+  if (e.id.startsWith('ko/')) continue;
+  const slug = e.id.slice(prefix.length);
+  if (!slug || slug.includes('/')) continue;
+  entries.push({
+    slug,
+    title: (e.data as any).title ?? slug,
+    summary: (e.data as any).summary,
+    subcategory: (e.data as any).subcategory,
+  });
 }
-
-const enDocs = collect(enPrefix);
-const koDocs = collect(koPrefix);
-
-// Pick the primary source by lang, fall back to the other side for missing.
-const primary = lang === 'ko' ? koDocs : enDocs;
+entries.sort((a, b) => a.slug.localeCompare(b.slug));
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const enHref = (slug: string) => `${base}/code-analysis/cubrid/${slug}/`;
-const koHref = (slug: string) => `${base}/ko/code-analysis/cubrid/${slug}/`;
-const otherLabel = lang === 'ko' ? 'EN' : 'KO';
-const otherHref  = lang === 'ko' ? enHref : koHref;
+const href = (slug: string) => `${base}/code-analysis/cubrid/${slug}/`;
 
-// Bucket primary entries by subcategory.
 const buckets = new Map<string, Entry[]>();
 const validSlugs = new Set(ORDER.map(([s]) => s));
 const untagged: Entry[] = [];
-for (const e of [...primary.values()].sort((a, b) => a.slug.localeCompare(b.slug))) {
+for (const e of entries) {
   if (e.subcategory && validSlugs.has(e.subcategory)) {
     if (!buckets.has(e.subcategory)) buckets.set(e.subcategory, []);
     buckets.get(e.subcategory)!.push(e);
@@ -89,8 +70,6 @@ for (const e of [...primary.values()].sort((a, b) => a.slug.localeCompare(b.slug
   }
 }
 
-// Slugify a heading the way Starlight's slugger does (lowercase, drop &/,
-// spaces → hyphens). Needed so the jumplist anchor matches the auto-id.
 function slugify(label: string): string {
   return label
     .toLowerCase()
@@ -99,26 +78,19 @@ function slugify(label: string): string {
     .replace(/\s+/g, '-');
 }
 
-// Compose the jumplist chips with counts.
-const chips: Array<{ label: string; href: string; count: number }> = [];
-for (const [slug, en, ko] of ORDER) {
+const chips: Array<{ label: string; href: string }> = [];
+for (const [slug, label] of ORDER) {
   const bucket = buckets.get(slug);
   if (!bucket || bucket.length === 0) continue;
-  const label = lang === 'ko' ? ko : en;
-  const labelWithCount = `${label} (${bucket.length})`;
   chips.push({
     label,
-    href: `#${slugify(labelWithCount)}`,
-    count: bucket.length,
+    href: `#${slugify(`${label} (${bucket.length})`)}`,
   });
 }
-
-const totalCount = primary.size;
-const jumpToLabel = lang === 'ko' ? '바로가기' : 'Jump to code-analysis';
 ---
 
 <p class="ca-jump">
-  <strong>{jumpToLabel}:</strong>{' '}
+  <strong>Jump to:</strong>{' '}
   {chips.map((c, i) => (
     <>
       {i > 0 && ' · '}
@@ -127,58 +99,18 @@ const jumpToLabel = lang === 'ko' ? '바로가기' : 'Jump to code-analysis';
   ))}
 </p>
 
-{ORDER.map(([slug, enLabel, koLabel]) => {
+{ORDER.map(([slug, label]) => {
   const bucket = buckets.get(slug);
   if (!bucket || bucket.length === 0) return null;
-  const label = lang === 'ko' ? koLabel : enLabel;
   const heading = `${label} (${bucket.length})`;
   const id = slugify(heading);
   return (
     <section class="ca-section">
       <h3 id={id}>{heading}</h3>
       <ul class="ca-list">
-        {bucket.map((e) => {
-          const primaryHref = lang === 'ko' ? koHref(e.slug) : enHref(e.slug);
-          const hasOther = (lang === 'ko' ? enDocs : koDocs).has(e.slug);
-          return (
-            <li>
-              <a href={primaryHref}>{e.title}</a>
-              {hasOther && (
-                <>
-                  {' | '}
-                  <a href={otherHref(e.slug)} class="ca-other">{otherLabel}</a>
-                </>
-              )}
-              {e.summary && (
-                <>
-                  {' — '}
-                  <span class="ca-summary">{e.summary}</span>
-                </>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </section>
-  );
-})}
-
-{untagged.length > 0 && (
-  <section class="ca-section">
-    <h3>{lang === 'ko' ? '기타' : 'Other'} ({untagged.length})</h3>
-    <ul class="ca-list">
-      {untagged.map((e) => {
-        const primaryHref = lang === 'ko' ? koHref(e.slug) : enHref(e.slug);
-        const hasOther = (lang === 'ko' ? enDocs : koDocs).has(e.slug);
-        return (
+        {bucket.map((e) => (
           <li>
-            <a href={primaryHref}>{e.title}</a>
-            {hasOther && (
-              <>
-                {' | '}
-                <a href={otherHref(e.slug)} class="ca-other">{otherLabel}</a>
-              </>
-            )}
+            <a href={href(e.slug)}>{e.title}</a>
             {e.summary && (
               <>
                 {' — '}
@@ -186,8 +118,27 @@ const jumpToLabel = lang === 'ko' ? '바로가기' : 'Jump to code-analysis';
               </>
             )}
           </li>
-        );
-      })}
+        ))}
+      </ul>
+    </section>
+  );
+})}
+
+{untagged.length > 0 && (
+  <section class="ca-section">
+    <h3>Other ({untagged.length})</h3>
+    <ul class="ca-list">
+      {untagged.map((e) => (
+        <li>
+          <a href={href(e.slug)}>{e.title}</a>
+          {e.summary && (
+            <>
+              {' — '}
+              <span class="ca-summary">{e.summary}</span>
+            </>
+          )}
+        </li>
+      ))}
     </ul>
   </section>
 )}
@@ -252,20 +203,5 @@ const jumpToLabel = lang === 'ko' ? '바로가기' : 'Jump to code-analysis';
 
   .ca-summary {
     color: var(--sl-color-gray-2);
-  }
-
-  .ca-other {
-    font-family: var(--sl-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    background: var(--sl-color-accent-low);
-    color: var(--sl-color-white);
-    padding: 1px 6px;
-    border-radius: 3px;
-    text-decoration: none;
-  }
-
-  .ca-other:hover {
-    color: var(--sl-color-accent);
   }
 </style>

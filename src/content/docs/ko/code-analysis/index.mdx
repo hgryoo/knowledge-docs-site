@@ -3,54 +3,6 @@ title: 코드 분석
 description: CUBRID 내부 모듈별 딥다이브.
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
-
-CUBRID 모듈 단위 분석서 카탈로그 — 소스와 함께 읽도록 쓰여진 글입니다.
-사이드바에서 모든 모듈을 볼 수 있고, 주제별 추천 읽기 순서는 아래에 있습니다.
-
-## 시작점
-
-<CardGrid>
-  <LinkCard
-    title="아키텍처 개요"
-    description="프로세스 모델, 계층 스택, 세부 문서로 가는 지도."
-    href="cubrid/cubrid-architecture-overview/"
-  />
-  <LinkCard
-    title="Lock Manager"
-    description="다중 단위 잠금, 모드 변환, 데드락 탐지."
-    href="cubrid/cubrid-lock-manager/"
-  />
-</CardGrid>
-
-## 주제별 읽기 순서
-
-### 트랜잭션 & 복구
-
-- [Transaction](cubrid/cubrid-transaction/)
-- [Lock Manager](cubrid/cubrid-lock-manager/)
-- [MVCC](cubrid/cubrid-mvcc/)
-- [Log Manager](cubrid/cubrid-log-manager/)
-- [Recovery Manager](cubrid/cubrid-recovery-manager/)
-- [Checkpoint](cubrid/cubrid-checkpoint/)
-- [Vacuum](cubrid/cubrid-vacuum/)
-- [Two-Phase Commit](cubrid/cubrid-2pc/)
-
-### 스토리지 엔진
-
-- [Disk Manager](cubrid/cubrid-disk-manager/)
-- [Page Buffer Manager](cubrid/cubrid-page-buffer-manager/)
-- [Heap Manager](cubrid/cubrid-heap-manager/)
-- [B-tree](cubrid/cubrid-btree/)
-- [Extendible Hash](cubrid/cubrid-extendible-hash/)
-- [Overflow File](cubrid/cubrid-overflow-file/)
-
-### 질의 처리
-
-- [Parser](cubrid/cubrid-parser/)
-- [Semantic Check](cubrid/cubrid-semantic-check/)
-- [Query Optimizer](cubrid/cubrid-query-optimizer/)
-- [XASL Generator](cubrid/cubrid-xasl-generator/)
-- [Query Executor](cubrid/cubrid-query-executor/)
-- [Scan Manager](cubrid/cubrid-scan-manager/)
-- [Parallel Query](cubrid/cubrid-parallel-query/)
+CUBRID 모듈 단위 분석서 — 소스와 함께 읽도록 쓰여진 글입니다. 전체 카탈로그는
+[영문 overview](../../code-analysis/) 를 참고하세요. 사이드바에서 모든 모듈을
+바로 열 수 있습니다.
