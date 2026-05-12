@@ -75,6 +75,10 @@ jobs:
           # Deployed at hgryoo.dev/knowledge-docs-site/.
           SITE_BASE: /knowledge-docs-site
           SITE_URL: https://hgryoo.dev/knowledge-docs-site
+          # In CI, knowledge-slides is checked out into a sibling of the
+          # site source under the runner workspace, NOT three levels up
+          # as on a local sibling-clone layout. Tell src/lib/decks.ts.
+          SLIDES_REPO: ${{ github.workspace }}/knowledge-slides
         run: npx astro build
 
       - name: Upload artifact

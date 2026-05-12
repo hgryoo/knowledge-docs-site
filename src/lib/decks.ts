@@ -3,8 +3,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const DECKS_ROOT = path.resolve(here, '../../../knowledge-slides/decks');
-const DIST_ROOT = path.resolve(here, '../../../knowledge-slides/dist');
+
+// SLIDES_REPO points at the root of a knowledge-slides checkout. The CI
+// workflow sets it to `${github.workspace}/knowledge-slides` (siblings
+// under the runner workspace); locally we fall back to a sibling clone
+// of the parent dir, matching the dev convention.
+const SLIDES_REPO =
+  process.env.SLIDES_REPO ?? path.resolve(here, '../../../knowledge-slides');
+const DECKS_ROOT = path.join(SLIDES_REPO, 'decks');
+const DIST_ROOT = path.join(SLIDES_REPO, 'dist');
 
 export type LangCode = 'en' | 'ko';
 const LANGS: LangCode[] = ['en', 'ko'];
