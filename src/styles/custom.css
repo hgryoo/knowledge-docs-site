@@ -1,91 +1,61 @@
-/* Editorial palette — matches sibling knowledge-slides-site.
- *
- * Light mode: warm paper background, near-black ink, oxblood accent.
- * Dark mode:  inverted but kept warm (no cold grays), softer accent.
+/* Neutral technical-docs palette — Biome / Knip lineage.
+ * Sans-serif throughout, restrained blue accent, deep neutral grays.
  */
 
 :root {
   --sl-font:
-    'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Inter', 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   --sl-font-mono:
     'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --kb-font-serif:
-    'Fraunces', 'Source Serif Pro', 'Noto Serif KR', Georgia,
-    'Times New Roman', serif;
+  /* Generous prose width for analysis docs with mermaid diagrams and
+   * wide tables. Applied via :root so it overrides Starlight default. */
+  --sl-content-width: 80rem;
 }
 
-/* Dark mode (Starlight default). */
+/* Dark mode (Starlight default). Cool neutral grays + blue accent. */
 :root,
 :root[data-theme='dark'] {
-  --sl-color-accent-low: #3a1714;
-  --sl-color-accent: #c9554a;
-  --sl-color-accent-high: #efc3bd;
+  --sl-color-accent-low: #1e3a5f;
+  --sl-color-accent: #60a5fa;
+  --sl-color-accent-high: #bfdbfe;
 
-  --sl-color-white: #f4ede4;
-  --sl-color-gray-1: #e7e1d6;
-  --sl-color-gray-2: #c9c3b8;
-  --sl-color-gray-3: #98928a;
-  --sl-color-gray-4: #6c6760;
-  --sl-color-gray-5: #4a463f;
-  --sl-color-gray-6: #2e2b27;
-  --sl-color-gray-7: #1f1d1a;
-  --sl-color-black: #161310;
+  --sl-color-white: #fafafa;
+  --sl-color-gray-1: #e4e4e7;
+  --sl-color-gray-2: #a1a1aa;
+  --sl-color-gray-3: #71717a;
+  --sl-color-gray-4: #52525b;
+  --sl-color-gray-5: #3f3f46;
+  --sl-color-gray-6: #27272a;
+  --sl-color-gray-7: #1a1a1d;
+  --sl-color-black: #09090b;
 
-  --sl-color-bg: #1a1815;
-  --sl-color-bg-nav: #18161300;
-  --sl-color-bg-sidebar: #18161300;
-  --sl-color-bg-inline-code: #2e2b27;
+  --sl-color-bg: #09090b;
+  --sl-color-bg-nav: #09090b00;
+  --sl-color-bg-sidebar: #09090b00;
+  --sl-color-bg-inline-code: #27272a;
 }
 
 :root[data-theme='light'] {
-  --sl-color-accent-low: #f1ddd9;
-  --sl-color-accent: #a8332a;
-  --sl-color-accent-high: #5a1c17;
+  --sl-color-accent-low: #dbeafe;
+  --sl-color-accent: #2563eb;
+  --sl-color-accent-high: #1e40af;
 
-  --sl-color-white: #1a1a1a;
-  --sl-color-gray-1: #2a2a2a;
-  --sl-color-gray-2: #4e4a45;
-  --sl-color-gray-3: #777370;
-  --sl-color-gray-4: #b8b3ac;
-  --sl-color-gray-5: #d9d4cc;
-  --sl-color-gray-6: #ece7df;
-  --sl-color-gray-7: #f3efe7;
-  --sl-color-black: #f7f5f0;
+  --sl-color-white: #0a0a0a;
+  --sl-color-gray-1: #18181b;
+  --sl-color-gray-2: #3f3f46;
+  --sl-color-gray-3: #71717a;
+  --sl-color-gray-4: #a1a1aa;
+  --sl-color-gray-5: #d4d4d8;
+  --sl-color-gray-6: #e4e4e7;
+  --sl-color-gray-7: #f4f4f5;
+  --sl-color-black: #ffffff;
 
-  --sl-color-bg: #f7f5f0;
-  --sl-color-bg-nav: #f7f5f000;
-  --sl-color-bg-sidebar: #f7f5f000;
-  --sl-color-bg-inline-code: #ece7df;
-}
-
-/* Serif headings inside markdown content — anchors the editorial tone. */
-.sl-markdown-content :is(h1, h2, h3) {
-  font-family: var(--kb-font-serif);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-
-.sl-markdown-content h1 {
-  font-size: 2.6rem;
-  line-height: 1.08;
-}
-
-.sl-markdown-content h2 {
-  margin-top: 2.6rem;
-  font-size: 1.7rem;
-}
-
-.sl-markdown-content h3 {
-  margin-top: 1.8rem;
-  font-size: 1.25rem;
-}
-
-/* Generous prose width — analysis docs have wide mermaid diagrams,
- * tables, and code blocks that need room. */
-:root {
-  --sl-content-width: 80rem;
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: #ffffff00;
+  --sl-color-bg-sidebar: #ffffff00;
+  --sl-color-bg-inline-code: #f4f4f5;
 }
 
 .sl-markdown-content {
@@ -93,65 +63,66 @@
   line-height: 1.7;
 }
 
-/* The header/page title that Starlight renders above the markdown. */
-.content-panel h1#_top {
-  font-family: var(--kb-font-serif);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-/* Accent the underline color on hovered links to match slides-site. */
-.sl-markdown-content a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
-/* Editorial accents reused by the custom landing + slides pages. */
-.kb-display {
-  font-family: var(--kb-font-serif);
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 1.02;
-}
-
-.kb-rule {
-  display: inline-block;
-  width: 22px;
-  height: 1px;
-  background: var(--sl-color-gray-3);
-  vertical-align: middle;
-  margin-right: 12px;
-}
-
-.kb-eyebrow {
+/* Headings within prose: sans-serif, weight via size not style. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--sl-font);
-  font-weight: 500;
-  font-size: 12px;
-  color: var(--sl-color-gray-3);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
-/* Used by the landing pages (index.mdx). */
-.kb-landing {
-  margin: 1rem 0 3rem;
-}
+.sl-markdown-content h1 { font-size: 2.2rem; line-height: 1.15; }
+.sl-markdown-content h2 { font-size: 1.5rem; margin-top: 2.4rem; }
+.sl-markdown-content h3 { font-size: 1.2rem; margin-top: 1.8rem; }
 
-.kb-display--xl {
-  font-size: clamp(48px, 7vw, 88px);
-  margin: 6px 0 24px;
-}
-
-.kb-lede {
-  font-size: 18px;
+/* Code-analysis catalog index. */
+.ca-jump {
+  border-top: 1px solid var(--sl-color-gray-5);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  padding: 14px 0;
+  margin: 28px 0;
+  font-size: 14px;
+  line-height: 1.7;
   color: var(--sl-color-gray-2);
-  max-width: 60ch;
-  margin: 0;
 }
 
-.kb-decks {
-  margin: 2rem 0;
+.ca-jump strong {
+  color: var(--sl-color-white);
+  margin-right: 4px;
+  font-weight: 600;
 }
+
+.ca-jump a {
+  color: var(--sl-color-gray-2);
+  text-decoration: underline;
+  text-decoration-color: var(--sl-color-gray-4);
+  text-underline-offset: 2px;
+}
+
+.ca-jump a:hover {
+  color: var(--sl-color-accent);
+  text-decoration-color: var(--sl-color-accent);
+}
+
+.ca-section { margin-top: 36px; }
+
+.ca-section h3 {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 24px 0 12px;
+  scroll-margin-top: 80px;
+}
+
+.ca-list { list-style: none; padding: 0; margin: 0; }
+
+.ca-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sl-color-gray-6);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ca-list li:last-child { border-bottom: none; }
+.ca-summary { color: var(--sl-color-gray-2); }
 
 /* Mermaid diagrams — click to open in lightbox with pan/zoom. */
 pre.mermaid {
@@ -179,8 +150,6 @@ pre.mermaid.mermaid-zoomable:hover {
   background: rgba(0, 0, 0, 0.85);
   z-index: 9999;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
   padding: 48px 24px 24px;
 }
 
@@ -193,10 +162,7 @@ pre.mermaid.mermaid-zoomable:hover {
   cursor: grab;
 }
 
-.mermaid-lightbox__stage svg {
-  display: block;
-  /* transform set inline; keep starting from top-left of stage */
-}
+.mermaid-lightbox__stage svg { display: block; }
 
 .mermaid-lightbox__close {
   position: absolute;
@@ -224,7 +190,6 @@ pre.mermaid.mermaid-zoomable:hover {
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: var(--sl-font);
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   background: rgba(0, 0, 0, 0.4);
