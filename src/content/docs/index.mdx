@@ -1,0 +1,64 @@
+---
+title: hgryoo · Docs
+description: Long-form notes, code analyses, and references.
+template: splash
+hero:
+  tagline: Long-form notes, code analyses, and references. Mostly DBMS internals — written while reading source and re-deriving designs from first principles.
+  actions:
+    - text: Browse code analysis
+      link: /code-analysis/
+      icon: right-arrow
+      variant: primary
+    - text: View slides
+      link: /slides/
+      icon: external
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<div class="kb-landing">
+  <p class="kb-eyebrow"><span class="kb-rule"></span>Hyunggyu Ryoo · Docs</p>
+  <h1 class="kb-display kb-display--xl">Notes &amp; Analyses</h1>
+  <p class="kb-lede">
+    Long-form analyses of database-system internals, technical references,
+    and reading notes. Written while reading source and re-deriving designs
+    from first principles. Currently focused on CUBRID — lock manager, MVCC,
+    recovery, storage layer — with more sections to follow.
+  </p>
+</div>
+
+## Featured
+
+<CardGrid>
+  <LinkCard
+    title="CUBRID Lock Manager"
+    description="Multi-granularity locking, mode conversion, waits-for-graph deadlock detection."
+    href="/code-analysis/cubrid/cubrid-lock-manager/"
+  />
+  <LinkCard
+    title="CUBRID MVCC"
+    description="Snapshot isolation realized on top of OID-shaped rows."
+    href="/code-analysis/cubrid/cubrid-mvcc/"
+  />
+  <LinkCard
+    title="Recovery Manager"
+    description="ARIES-style WAL, analysis/redo/undo, checkpoints."
+    href="/code-analysis/cubrid/cubrid-recovery-manager/"
+  />
+  <LinkCard
+    title="Architecture Overview"
+    description="A top-down map of the codebase before the deep dives."
+    href="/code-analysis/cubrid/cubrid-architecture-overview/"
+  />
+</CardGrid>
+
+## Browse
+
+<CardGrid>
+  <Card title="Code Analysis" icon="document">
+    Per-module CUBRID deep dives. [Open the catalog →](/code-analysis/)
+  </Card>
+  <Card title="Slides" icon="seti:powerpoint">
+    Talks and notes built from these analyses. [Open the deck list →](/slides/)
+  </Card>
+</CardGrid>

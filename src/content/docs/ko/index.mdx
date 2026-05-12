@@ -1,0 +1,64 @@
+---
+title: hgryoo · Docs
+description: 장문 노트, 코드 분석, 그리고 레퍼런스.
+template: splash
+hero:
+  tagline: 장문 노트, 코드 분석, 그리고 레퍼런스. 주로 DBMS 내부 — 코드를 읽으면서 설계를 원리에서부터 재구성하며 쓴 글들.
+  actions:
+    - text: 코드 분석 둘러보기
+      link: /ko/code-analysis/
+      icon: right-arrow
+      variant: primary
+    - text: 발표 자료 보기
+      link: /ko/slides/
+      icon: external
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<div class="kb-landing">
+  <p class="kb-eyebrow"><span class="kb-rule"></span>류형규 · Docs</p>
+  <h1 class="kb-display kb-display--xl">Notes &amp; Analyses</h1>
+  <p class="kb-lede">
+    데이터베이스 내부 구조 분석서, 기술 레퍼런스, 그리고 읽기 노트. 코드를
+    읽으면서, 설계를 원리에서부터 재구성하면서 쓴 글입니다. 현재는 CUBRID —
+    락 매니저, MVCC, 복구, 스토리지 계층 — 가 중심이고, 다른 섹션은 차차
+    추가됩니다.
+  </p>
+</div>
+
+## 추천
+
+<CardGrid>
+  <LinkCard
+    title="CUBRID Lock Manager"
+    description="다중 입도 잠금, 모드 변환, waits-for 그래프 기반 교착 검출."
+    href="/ko/code-analysis/cubrid/cubrid-lock-manager/"
+  />
+  <LinkCard
+    title="CUBRID MVCC"
+    description="OID 기반 row 위에서 구현된 스냅숏 격리."
+    href="/ko/code-analysis/cubrid/cubrid-mvcc/"
+  />
+  <LinkCard
+    title="Recovery Manager"
+    description="ARIES 스타일 WAL, analysis/redo/undo, 체크포인트."
+    href="/ko/code-analysis/cubrid/cubrid-recovery-manager/"
+  />
+  <LinkCard
+    title="아키텍처 개요"
+    description="딥다이브 들어가기 전 코드베이스 톱다운 지도."
+    href="/ko/code-analysis/cubrid/cubrid-architecture-overview/"
+  />
+</CardGrid>
+
+## 둘러보기
+
+<CardGrid>
+  <Card title="코드 분석" icon="document">
+    CUBRID 모듈별 분석서. [카탈로그 열기 →](/ko/code-analysis/)
+  </Card>
+  <Card title="발표 자료" icon="seti:powerpoint">
+    분석서에서 파생된 발표 슬라이드. [데크 목록 →](/ko/slides/)
+  </Card>
+</CardGrid>

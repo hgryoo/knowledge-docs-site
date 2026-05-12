@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env
+.env.production
+
+# OMC session state (per-developer, not shared).
+.omc/
+.claude/
+
+# Content materialized from sibling knowledge-base/ by prebuild.sh.
+# Always regenerated; never tracked.
+src/content/docs/code-analysis/cubrid/
+src/content/docs/ko/code-analysis/cubrid/

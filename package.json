@@ -1,0 +1,22 @@
+{
+  "name": "knowledge-docs-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "bash prebuild.sh",
+    "predev": "bash prebuild.sh",
+    "prestart": "bash prebuild.sh",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "refresh": "bash prebuild.sh"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.34.0",
+    "astro": "^5.0.0",
+    "sharp": "^0.33.0"
+  }
+}

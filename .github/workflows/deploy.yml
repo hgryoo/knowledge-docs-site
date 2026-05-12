@@ -1,0 +1,90 @@
+name: Deploy Starlight site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Triggered from the knowledge-base repo on every push so docs stay
+  # in sync with the source. Configure a `knowledge-base-push` event
+  # on the kb side that POSTs to this repo's dispatch endpoint.
+  repository_dispatch:
+    types: [knowledge-base-push]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout knowledge-base content (private)
+        uses: actions/checkout@v4
+        with:
+          repository: hgryoo/knowledge-base
+          path: knowledge-base
+          fetch-depth: 0
+          # Personal access token with `repo:read` on hgryoo/knowledge-base.
+          # Set the secret in: repo Settings → Secrets and variables →
+          # Actions → New repository secret → KNOWLEDGE_BASE_TOKEN.
+          # Mirrors the pattern used by knowledge-base-site.
+          token: ${{ secrets.KNOWLEDGE_BASE_TOKEN }}
+
+      - name: Checkout knowledge-slides (private)
+        uses: actions/checkout@v4
+        with:
+          repository: hgryoo/knowledge-slides
+          path: knowledge-slides
+          fetch-depth: 0
+          # PAT with `repo:read` (Contents: Read) on hgryoo/knowledge-slides.
+          # Mirror of KNOWLEDGE_BASE_TOKEN — kept as a separate secret so
+          # scopes/rotation are independent per upstream repo.
+          token: ${{ secrets.KNOWLEDGE_SLIDES_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install npm deps
+        run: npm ci
+
+      - name: Materialize content (prebuild)
+        env:
+          # SRC defaults to ../knowledge-base/knowledge relative to this
+          # checkout. In CI, both repos are siblings under the runner's
+          # workspace, so override SRC to point at the checked-out path.
+          SRC: ${{ github.workspace }}/knowledge-base/knowledge
+        run: bash prebuild.sh
+
+      - name: Build site
+        run: npx astro build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

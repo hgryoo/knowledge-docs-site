@@ -1,0 +1,26 @@
+---
+title: 발표 자료
+description: 분석서에서 파생된 발표 슬라이드와 노트.
+---
+
+import DeckCard from '../../../components/DeckCard.astro';
+import { loadDecks } from '../../../lib/decks';
+
+export const decks = loadDecks();
+
+분석서에서 파생된 데크의 가벼운 인덱스입니다. 각 카드는 독립 데크 사이트로
+링크되며, 거기에 전체 HTML/PDF가 호스팅됩니다.
+
+{decks.length === 0 ? (
+  <p class="kb-eyebrow"><span class="kb-rule"></span>아직 인덱싱된 데크가 없습니다.</p>
+) : (
+  <div class="kb-decks">
+    {decks.map((deck) => <DeckCard deck={deck} lang="ko" />)}
+  </div>
+)}
+
+---
+
+데크는 [`knowledge-slides`](../) 에 있으며 독립 사이트
+[`knowledge-slides-site`](http://localhost:9999) 에서 서빙됩니다 —
+풀 랜딩 페이지가 필요하면 외부 사이트를 열어주세요.

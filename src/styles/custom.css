@@ -1,0 +1,150 @@
+/* Editorial palette — matches sibling knowledge-slides-site.
+ *
+ * Light mode: warm paper background, near-black ink, oxblood accent.
+ * Dark mode:  inverted but kept warm (no cold grays), softer accent.
+ */
+
+:root {
+  --sl-font:
+    'Pretendard Variable', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  --sl-font-mono:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --kb-font-serif:
+    'Fraunces', 'Source Serif Pro', 'Noto Serif KR', Georgia,
+    'Times New Roman', serif;
+}
+
+/* Dark mode (Starlight default). */
+:root,
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #3a1714;
+  --sl-color-accent: #c9554a;
+  --sl-color-accent-high: #efc3bd;
+
+  --sl-color-white: #f4ede4;
+  --sl-color-gray-1: #e7e1d6;
+  --sl-color-gray-2: #c9c3b8;
+  --sl-color-gray-3: #98928a;
+  --sl-color-gray-4: #6c6760;
+  --sl-color-gray-5: #4a463f;
+  --sl-color-gray-6: #2e2b27;
+  --sl-color-gray-7: #1f1d1a;
+  --sl-color-black: #161310;
+
+  --sl-color-bg: #1a1815;
+  --sl-color-bg-nav: #18161300;
+  --sl-color-bg-sidebar: #18161300;
+  --sl-color-bg-inline-code: #2e2b27;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #f1ddd9;
+  --sl-color-accent: #a8332a;
+  --sl-color-accent-high: #5a1c17;
+
+  --sl-color-white: #1a1a1a;
+  --sl-color-gray-1: #2a2a2a;
+  --sl-color-gray-2: #4e4a45;
+  --sl-color-gray-3: #777370;
+  --sl-color-gray-4: #b8b3ac;
+  --sl-color-gray-5: #d9d4cc;
+  --sl-color-gray-6: #ece7df;
+  --sl-color-gray-7: #f3efe7;
+  --sl-color-black: #f7f5f0;
+
+  --sl-color-bg: #f7f5f0;
+  --sl-color-bg-nav: #f7f5f000;
+  --sl-color-bg-sidebar: #f7f5f000;
+  --sl-color-bg-inline-code: #ece7df;
+}
+
+/* Serif headings inside markdown content — anchors the editorial tone. */
+.sl-markdown-content :is(h1, h2, h3) {
+  font-family: var(--kb-font-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.sl-markdown-content h1 {
+  font-size: 2.6rem;
+  line-height: 1.08;
+}
+
+.sl-markdown-content h2 {
+  margin-top: 2.6rem;
+  font-size: 1.7rem;
+}
+
+.sl-markdown-content h3 {
+  margin-top: 1.8rem;
+  font-size: 1.25rem;
+}
+
+/* Slightly tighter prose width — long analysis docs read better narrower. */
+.sl-markdown-content {
+  --sl-content-width: 50rem;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* The header/page title that Starlight renders above the markdown. */
+.content-panel h1#_top {
+  font-family: var(--kb-font-serif);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Accent the underline color on hovered links to match slides-site. */
+.sl-markdown-content a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* Editorial accents reused by the custom landing + slides pages. */
+.kb-display {
+  font-family: var(--kb-font-serif);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+.kb-rule {
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  background: var(--sl-color-gray-3);
+  vertical-align: middle;
+  margin-right: 12px;
+}
+
+.kb-eyebrow {
+  font-family: var(--sl-font);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--sl-color-gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* Used by the landing pages (index.mdx). */
+.kb-landing {
+  margin: 1rem 0 3rem;
+}
+
+.kb-display--xl {
+  font-size: clamp(48px, 7vw, 88px);
+  margin: 6px 0 24px;
+}
+
+.kb-lede {
+  font-size: 18px;
+  color: var(--sl-color-gray-2);
+  max-width: 60ch;
+  margin: 0;
+}
+
+.kb-decks {
+  margin: 2rem 0;
+}

@@ -1,0 +1,56 @@
+---
+title: 코드 분석
+description: CUBRID 내부 모듈별 딥다이브.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+CUBRID 모듈 단위 분석서 카탈로그 — 소스와 함께 읽도록 쓰여진 글입니다.
+사이드바에서 모든 모듈을 볼 수 있고, 주제별 추천 읽기 순서는 아래에 있습니다.
+
+## 시작점
+
+<CardGrid>
+  <LinkCard
+    title="아키텍처 개요"
+    description="모듈별 딥다이브로 들어가기 전 코드베이스 톱다운 지도."
+    href="/ko/code-analysis/cubrid/cubrid-architecture-overview/"
+  />
+  <LinkCard
+    title="Lock Manager"
+    description="다중 입도 잠금 + waits-for 그래프 교착 검출."
+    href="/ko/code-analysis/cubrid/cubrid-lock-manager/"
+  />
+</CardGrid>
+
+## 주제별 읽기 순서
+
+### 트랜잭션 & 복구
+
+- [Transaction](/ko/code-analysis/cubrid/cubrid-transaction/)
+- [Lock Manager](/ko/code-analysis/cubrid/cubrid-lock-manager/)
+- [MVCC](/ko/code-analysis/cubrid/cubrid-mvcc/)
+- [Log Manager](/ko/code-analysis/cubrid/cubrid-log-manager/)
+- [Recovery Manager](/ko/code-analysis/cubrid/cubrid-recovery-manager/)
+- [Checkpoint](/ko/code-analysis/cubrid/cubrid-checkpoint/)
+- [Vacuum](/ko/code-analysis/cubrid/cubrid-vacuum/)
+- [Two-Phase Commit](/ko/code-analysis/cubrid/cubrid-2pc/)
+
+### 스토리지 엔진
+
+- [Disk Manager](/ko/code-analysis/cubrid/cubrid-disk-manager/)
+- [Page Buffer Manager](/ko/code-analysis/cubrid/cubrid-page-buffer-manager/)
+- [Heap Manager](/ko/code-analysis/cubrid/cubrid-heap-manager/)
+- [B-tree](/ko/code-analysis/cubrid/cubrid-btree/)
+- [Extendible Hash](/ko/code-analysis/cubrid/cubrid-extendible-hash/)
+- [Overflow File](/ko/code-analysis/cubrid/cubrid-overflow-file/)
+
+### 질의 처리
+
+- [Parser](/ko/code-analysis/cubrid/cubrid-parser/)
+- [Semantic Check](/ko/code-analysis/cubrid/cubrid-semantic-check/)
+- [Query Optimizer](/ko/code-analysis/cubrid/cubrid-query-optimizer/)
+- [XASL Generator](/ko/code-analysis/cubrid/cubrid-xasl-generator/)
+- [Query Executor](/ko/code-analysis/cubrid/cubrid-query-executor/)
+- [Scan Manager](/ko/code-analysis/cubrid/cubrid-scan-manager/)
+- [Parallel Query](/ko/code-analysis/cubrid/cubrid-parallel-query/)

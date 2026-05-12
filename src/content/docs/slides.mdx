@@ -1,0 +1,26 @@
+---
+title: Slides
+description: Talks and notes built from the code analyses.
+---
+
+import DeckCard from '../../components/DeckCard.astro';
+import { loadDecks } from '../../lib/decks';
+
+export const decks = loadDecks();
+
+A lightweight index of decks built from these analyses. Each card links
+out to the standalone deck site, which hosts the full HTML and PDF.
+
+{decks.length === 0 ? (
+  <p class="kb-eyebrow"><span class="kb-rule"></span>No decks indexed yet.</p>
+) : (
+  <div class="kb-decks">
+    {decks.map((deck) => <DeckCard deck={deck} lang="en" />)}
+  </div>
+)}
+
+---
+
+The decks live in [`knowledge-slides`](../) and are served from the
+standalone [`knowledge-slides-site`](http://localhost:9999) — open the
+external site for the full landing page experience.
