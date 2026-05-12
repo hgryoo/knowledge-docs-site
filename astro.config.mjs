@@ -58,21 +58,10 @@ export default defineConfig({
           autogenerate: { directory: 'code-analysis' },
         },
         {
-          label: 'Slides',
-          translations: { ko: '발표 자료' },
-          items: [
-            {
-              label: 'All decks',
-              translations: { ko: '전체 목록' },
-              link: '/slides/',
-            },
-            {
-              label: 'Standalone site ↗',
-              translations: { ko: '독립 사이트 ↗' },
-              link: 'http://localhost:9999',
-              attrs: { target: '_blank', rel: 'noopener' },
-            },
-          ],
+          label: 'Slides ↗',
+          translations: { ko: '발표 자료 ↗' },
+          link: 'https://hgryoo.dev/knowledge-slides-site/',
+          attrs: { target: '_blank', rel: 'noopener' },
         },
       ],
       customCss: ['./src/styles/custom.css'],

@@ -46,27 +46,22 @@ npm run refresh        # rsync + sanitize, picks up new docs
 
 Astro hot-reload picks up the rsync'd files within a second.
 
-## Private upstream repos
+## Private upstream repo
 
-Both `hgryoo/knowledge-base` (analysis source) and `hgryoo/knowledge-slides`
-(deck source) are private. Following the pattern set by `knowledge-base-site`:
+The analysis source `hgryoo/knowledge-base` is private. Following the
+pattern set by `knowledge-base-site`:
 
-- **Local dev**: clone both as siblings of this repo. `prebuild.sh` reads
-  from `../knowledge-base/knowledge` (override with `SRC=...`), and
-  `src/lib/decks.ts` reads from `../knowledge-slides/decks/`.
+- **Local dev**: clone `knowledge-base` as a sibling of this repo.
+  `prebuild.sh` reads from `../knowledge-base/knowledge` (override
+  with `SRC=...`).
 - **CI (GitHub Actions)**: `.github/workflows/deploy.yml` uses
-  `actions/checkout` with two PATs stored as repo secrets — kept
-  independent so each can rotate without breaking the other:
+  `actions/checkout` with a `KNOWLEDGE_BASE_TOKEN` repo secret (PAT
+  with `Contents: Read` on `hgryoo/knowledge-base`).
 
-  | Secret | Scope | Used for |
-  |---|---|---|
-  | `KNOWLEDGE_BASE_TOKEN`   | `Contents: Read` on `hgryoo/knowledge-base`   | Checkout analysis docs |
-  | `KNOWLEDGE_SLIDES_TOKEN` | `Contents: Read` on `hgryoo/knowledge-slides` | Checkout deck metadata + dist |
-
-  Add a `repository_dispatch` event named `knowledge-base-push` from the
-  upstream repos to re-trigger this build whenever they push. The
-  knowledge-base side already runs `notify-site.yml` for that — extending
-  it to dispatch here is a one-step addition.
+  Add a `repository_dispatch` event named `knowledge-base-push` from
+  the upstream repo to re-trigger this build whenever it pushes. The
+  knowledge-base side already runs `notify-site.yml` for that —
+  extending it to dispatch here is a one-step addition.
 
 ## i18n
 
@@ -79,18 +74,11 @@ Both `hgryoo/knowledge-base` (analysis source) and `hgryoo/knowledge-slides`
 
 ## Slides
 
-Two integration points (the user asked for both):
-
-1. In-site **Slides** page (`/slides/`, `/ko/slides/`) — uses
-   `src/lib/decks.ts` to read `../knowledge-slides/decks/*/metadata.json`
-   at build time, renders one `DeckCard` per deck, links out to the
-   standalone deck site for the actual HTML/PDF.
-2. Sidebar link **Standalone site ↗** — points at
-   `http://localhost:9999`, the existing
-   [`knowledge-slides-site/`](../knowledge-slides-site/) landing.
-
-The standalone site URL is currently hard-coded for local dev. Replace it
-with the deployed URL before publishing.
+This site links out to the standalone
+[`knowledge-slides-site`](https://hgryoo.dev/knowledge-slides-site/) for
+the deck listing — both via the hero "View slides ↗" action and the
+sidebar "Slides ↗" item. There is no in-site deck index here; the
+standalone site already owns that view.
 
 ## Design
 

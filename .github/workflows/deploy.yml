@@ -40,17 +40,6 @@ jobs:
           # Mirrors the pattern used by knowledge-base-site.
           token: ${{ secrets.KNOWLEDGE_BASE_TOKEN }}
 
-      - name: Checkout knowledge-slides (private)
-        uses: actions/checkout@v4
-        with:
-          repository: hgryoo/knowledge-slides
-          path: knowledge-slides
-          fetch-depth: 0
-          # PAT with `repo:read` (Contents: Read) on hgryoo/knowledge-slides.
-          # Mirror of KNOWLEDGE_BASE_TOKEN — kept as a separate secret so
-          # scopes/rotation are independent per upstream repo.
-          token: ${{ secrets.KNOWLEDGE_SLIDES_TOKEN }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -75,13 +64,6 @@ jobs:
           # Deployed at hgryoo.dev/knowledge-docs-site/.
           SITE_BASE: /knowledge-docs-site
           SITE_URL: https://hgryoo.dev/knowledge-docs-site
-          # In CI, knowledge-slides is checked out into a sibling of the
-          # site source under the runner workspace, NOT three levels up
-          # as on a local sibling-clone layout. Tell src/lib/decks.ts.
-          SLIDES_REPO: ${{ github.workspace }}/knowledge-slides
-          # In-site /slides/ deck cards link out to the standalone
-          # knowledge-slides-site for the actual HTML/PDF assets.
-          STANDALONE_BASE: https://hgryoo.dev/knowledge-slides-site
         run: npx astro build
 
       - name: Upload artifact
