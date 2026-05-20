@@ -61,6 +61,26 @@ function scanLocalSidebar() {
 
 const localSidebarEntries = scanLocalSidebar();
 
+const isProd = process.env.NODE_ENV === 'production';
+const gaHead = isProd
+  ? [
+      {
+        tag: 'script',
+        attrs: {
+          async: true,
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-MLFTZW11Q0',
+        },
+      },
+      {
+        tag: 'script',
+        content: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-MLFTZW11Q0');`,
+      },
+    ]
+  : [];
+
 export default defineConfig({
   site: siteUrl,
   base: siteBase || undefined,
@@ -114,6 +134,7 @@ export default defineConfig({
       ],
       customCss: ['./src/styles/custom.css'],
       head: [
+        ...gaHead,
         {
           tag: 'script',
           attrs: { type: 'module' },
