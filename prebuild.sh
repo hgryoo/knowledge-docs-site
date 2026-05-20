@@ -64,6 +64,50 @@ echo ">> sanitize frontmatter"
 python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$EN_DEST"
 python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$KO_DEST"
 
+# Local-only trees. Driven by ./local-trees.conf (gitignored, per-machine).
+# Each entry: "<dest_under_local>|<abs_src>[|<comma_subdirs>]".
+# Missing src dirs are skipped silently, so CI hosts (where the file is
+# absent or paths don't exist) are unaffected.
+LOCAL_ROOT="$SCRIPT_DIR/src/content/docs/local"
+rm -rf "$LOCAL_ROOT"
+
+LOCAL_CONF="$SCRIPT_DIR/local-trees.conf"
+if [[ -f "$LOCAL_CONF" ]]; then
+  LOCAL_TREES=()
+  # shellcheck source=/dev/null
+  source "$LOCAL_CONF"
+  for entry in "${LOCAL_TREES[@]}"; do
+    IFS='|' read -r dest src subdirs <<< "$entry"
+    if [[ -z "$dest" || -z "$src" ]]; then
+      echo "WARN: malformed LOCAL_TREES entry: $entry" >&2
+      continue
+    fi
+    if [[ ! -d "$src" ]]; then
+      echo "skip LOCAL: $src not found"
+      continue
+    fi
+    dest_full="$LOCAL_ROOT/$dest"
+    mkdir -p "$dest_full"
+    if [[ -n "${subdirs:-}" ]]; then
+      IFS=',' read -r -a sub_arr <<< "$subdirs"
+      for sub in "${sub_arr[@]}"; do
+        if [[ -d "$src/$sub" ]]; then
+          mkdir -p "$dest_full/$sub"
+          echo ">> rsync LOCAL $dest/$sub  ←  $src/$sub"
+          rsync -a "${COMMON_EXCLUDES[@]}" "$src/$sub/" "$dest_full/$sub/"
+        fi
+      done
+    else
+      echo ">> rsync LOCAL $dest  ←  $src"
+      rsync -a "${COMMON_EXCLUDES[@]}" "$src/" "$dest_full/"
+    fi
+    python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$dest_full"
+    python3 "$SCRIPT_DIR/scripts/quote_list_items.py" "$dest_full"
+    python3 "$SCRIPT_DIR/scripts/inject_title.py" "$dest_full"
+  done
+fi
+
 en_count=$(find "$EN_DEST" -type f -name '*.md' | wc -l)
 ko_count=$(find "$KO_DEST" -type f -name '*.md' 2>/dev/null | wc -l || echo 0)
-echo "prebuild: en=$en_count md, ko=$ko_count md"
+local_count=$(find "$LOCAL_ROOT" -type f -name '*.md' 2>/dev/null | wc -l || echo 0)
+echo "prebuild: en=$en_count md, ko=$ko_count md, local=$local_count md"

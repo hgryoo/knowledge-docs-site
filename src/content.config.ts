@@ -12,8 +12,12 @@ const kbExtensions = z.object({
   project: z.string().optional(),
   module: z.string().optional(),
   subcategory: z.string().optional(),
-  sources: z.array(z.string()).optional(),
-  references: z.array(z.string()).optional(),
+  // sources/references are informational metadata only. The kb and local
+  // trees sometimes have list items containing colons (e.g.
+  // `- AWS Blog — "Improve performance: diagnose ..."`) which YAML parses
+  // as objects rather than strings. Accept any array shape.
+  sources: z.array(z.unknown()).optional(),
+  references: z.array(z.unknown()).optional(),
   summary: z.string().optional(),
   created: z.union([z.string(), z.date()]).optional(),
   updated: z.union([z.string(), z.date()]).optional(),

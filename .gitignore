@@ -13,3 +13,16 @@ dist/
 # Always regenerated; never tracked.
 src/content/docs/code-analysis/cubrid/
 src/content/docs/ko/code-analysis/cubrid/
+
+# Local-only trees rsync'd per local-trees.conf.
+# Developer machine only; not present (and not built) in CI.
+src/content/docs/local/
+
+# Per-machine list of local trees to materialize. See
+# local-trees.conf.example for the format.
+local-trees.conf
+
+# Auto-bumped on every refresh-local-trees.sh run so a running dev
+# server reloads its sidebar when new local trees appear. See
+# scripts/refresh-local-trees.sh and astro.config.mjs.
+local-trees-marker.mjs

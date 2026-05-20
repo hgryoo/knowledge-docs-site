@@ -3,8 +3,28 @@ import starlight from '@astrojs/starlight';
 import rehypeMermaidPre from './src/lib/rehype-mermaid-pre.mjs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import fs from 'node:fs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+
+// Bootstrap the local-trees marker file if missing so the static import
+// below can resolve on fresh checkouts. The marker is gitignored and
+// rewritten on every refresh-local-trees.sh run; its content change is
+// what wakes up the dev-server's config watcher when a new local tree
+// is added. See scripts/refresh-local-trees.sh.
+const markerPath = path.join(here, 'local-trees-marker.mjs');
+if (!fs.existsSync(markerPath)) {
+  fs.writeFileSync(
+    markerPath,
+    `// Auto-generated bootstrap. See scripts/refresh-local-trees.sh.\n` +
+      `export const LAST_REFRESH = '${new Date().toISOString()}';\n`,
+    'utf-8',
+  );
+}
+// Static import: registers local-trees-marker.mjs in vite's config-file
+// watch graph so rewriting it triggers a server restart.
+import { LAST_REFRESH as _LAST_REFRESH } from './local-trees-marker.mjs';
+void _LAST_REFRESH;
 const kbRepo = path.resolve(here, '../knowledge-base');
 const slidesRepo = path.resolve(here, '../knowledge-slides');
 
@@ -13,6 +33,33 @@ const slidesRepo = path.resolve(here, '../knowledge-slides');
 // root so `npm run dev` keeps working at http://localhost:9998/.
 const siteBase = process.env.SITE_BASE || '';
 const siteUrl = process.env.SITE_URL || `http://localhost:9998${siteBase}`;
+
+// Local-only sidebar entries. CI sets SITE_BASE (it deploys to a Pages
+// subpath), so the absence of SITE_BASE is our "dev machine" signal. The
+// matching content trees are materialized by prebuild.sh per the list in
+// local-trees.conf (gitignored, per-machine); the sidebar mirrors that
+// by scanning src/content/docs/local/ at config-load time, so adding a
+// new tree to the conf and rerunning prebuild is all that's needed.
+const includeLocal = !siteBase;
+
+function scanLocalSidebar() {
+  if (!includeLocal) return [];
+  const root = path.join(here, 'src/content/docs/local');
+  if (!fs.existsSync(root)) return [];
+  return fs
+    .readdirSync(root, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((d) => ({
+      label: `${d.name} (local)`,
+      translations: { ko: `${d.name} (로컬)` },
+      badge: { text: 'local', variant: 'note' },
+      collapsed: true,
+      autogenerate: { directory: `local/${d.name}` },
+    }));
+}
+
+const localSidebarEntries = scanLocalSidebar();
 
 export default defineConfig({
   site: siteUrl,
@@ -57,6 +104,7 @@ export default defineConfig({
           translations: { ko: '코드 분석' },
           autogenerate: { directory: 'code-analysis' },
         },
+        ...localSidebarEntries,
         {
           label: 'Slides ↗',
           translations: { ko: '발표 자료 ↗' },

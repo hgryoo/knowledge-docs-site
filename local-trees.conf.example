@@ -1,0 +1,21 @@
+# Per-machine list of local trees materialized into src/content/docs/local/.
+# Copy this file to `local-trees.conf` (gitignored) and edit for the host.
+#
+# Format: each LOCAL_TREES entry is "<dest>|<src>[|<subdirs>]"
+#   dest    relative path under src/content/docs/local/
+#   src     absolute path that must exist on this machine
+#   subdirs (optional) comma-separated whitelist of immediate children
+#           to rsync; omit to rsync the whole src tree.
+#
+# prebuild.sh sources this file. Missing src dirs are skipped silently,
+# so CI (where /data/* does not exist) is unaffected.
+#
+# astro.config.mjs does NOT read this file — it scans
+# src/content/docs/local/ at config-load time and registers one sidebar
+# group per top-level directory. The sidebar entries only appear when
+# SITE_BASE is unset (i.e. local dev).
+
+LOCAL_TREES=(
+  "cub_sys/roadmap|/data/cub_sys/roadmap"
+  "cubrid_cv|/data/cubrid_cv|dev_process,history,issue,monthly,plan,reviews,scaffold,survey"
+)
