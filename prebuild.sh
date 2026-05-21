@@ -104,6 +104,15 @@ if [[ -f "$LOCAL_CONF" ]]; then
     python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$dest_full"
     python3 "$SCRIPT_DIR/scripts/quote_list_items.py" "$dest_full"
     python3 "$SCRIPT_DIR/scripts/inject_title.py" "$dest_full"
+    # For cub_sys / cubrid_cv, the sidebar shows filename stems instead of
+    # the md title so readers can navigate by the same path they cite in
+    # chat / commits / JIRA. Code-analysis subtrees keep their narrative
+    # titles (handled inside the script).
+    # Prefix match handles subdir-scoped dests like "cub_sys/roadmap" in
+    # local-trees.conf.
+    if [[ "$dest" == cub_sys* || "$dest" == cubrid_cv* ]]; then
+      python3 "$SCRIPT_DIR/scripts/inject_sidebar_label.py" "$dest_full"
+    fi
   done
 fi
 
