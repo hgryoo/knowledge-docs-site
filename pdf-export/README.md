@@ -45,6 +45,43 @@ PDF 가 md 옆에 존재하면 그 페이지의 H1 아래에 자동으로 ⇣ `P
 
 새 트랙을 추가하면 (예: `print-book.css` → `<slug>.book.pdf`) 버튼이 자동으로 같이 나타난다. `trackLabel` 매핑에 한 줄 추가하면 라벨도 친화적으로 보인다.
 
+## Roadmap (local-trees) PDFs
+
+`build-pdf.sh` 는 `code-analysis/cubrid/<slug>` 만 다룬다. roadmap·cubrid_cv
+같은 local-tree 문서는 별도 진입점 `scripts/render-roadmap.mjs` 를 쓴다.
+공통 print CSS / 헤더 / 푸터 템플릿은 share — 트랙 이름도 `cubrid` 동일.
+
+표준 시각 컨벤션 (2026-05-22 N27 batch 에서 확정):
+
+- **페이지 1**: 문서 제목 + 본문 내 *Table of Contents* 만.
+- **페이지 2 이후**: 모든 번호 섹션 (`## N. ...`) 이 새 페이지에서 시작.
+  Table of Contents 와 비번호 h2 는 page-break 영향 받지 않음.
+- **DOM strip** (render 시점, 소스 md 는 무수정):
+    - 첫 blockquote (`> Self-contained...` 식 head note) 제거.
+    - `Open Questions` / `Review Log` 섹션 전체 제거 — h2 + 해당
+      `div.sl-heading-wrapper.level-h2` 의 다음 형제들을 다음 h2 wrapper
+      직전까지 모두 떼어낸다. (h2.nextElementSibling 으로 walk 하면
+      wrapper 내부의 anchor 만 잡혀서 본문이 안 지워지는 버그가 있음.)
+- **헤더 좌측**: `CUBRID Lock Manager · <Document Name>` — 프로젝트
+  번호 (N27 등) 는 *넣지 않는다*. 우측: 렌더 날짜.
+- **푸터 좌측**: `hgryoo` (CUBRID 로고 모노그램 + 닉네임 만). 조직명
+  (CUBRID Systems Research 등) 은 사용자가 명시 요청할 때만 추가.
+- **푸터 우측**: 페이지 번호 (`N / total`). 슬러그·파일명 같은 메타는
+  *넣지 않는다* — PDF 파일명이 이미 그 정보를 들고 있음.
+- **PageTitle 다운로드 버튼**: PDF 안에서는 `display: none`
+  (`.pdf-actions` 가 print CSS hide 리스트에 들어 있음).
+
+호출 예 (스크립트 안에 N27 경로가 하드코딩되어 있음. 다른 프로젝트로
+복제할 때는 `URL_PREFIX` / `OUT_DIR` / `DOCS` 만 수정):
+
+```bash
+node /data/hgryoo/knowledge-docs-site/pdf-export/scripts/render-roadmap.mjs
+```
+
+`astro dev` (또는 `astro preview`) 가 127.0.0.1:9998 에서 살아 있어야
+한다. 스크립트는 이 dev 서버에 붙어 페이지마다 Playwright + print-cubrid.css
+를 적용해 `<slug>.cubrid.pdf` 를 소스 md 옆에 떨어뜨린다.
+
 ## 왜 이렇게 만들었나 (재사용을 위한 결정 로그)
 
 ### 결정 1 — Playwright 한 가지로 두 트랙 처리
