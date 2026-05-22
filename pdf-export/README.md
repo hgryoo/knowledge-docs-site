@@ -70,6 +70,14 @@ PDF 가 md 옆에 존재하면 그 페이지의 H1 아래에 자동으로 ⇣ `P
   *넣지 않는다* — PDF 파일명이 이미 그 정보를 들고 있음.
 - **PageTitle 다운로드 버튼**: PDF 안에서는 `display: none`
   (`.pdf-actions` 가 print CSS hide 리스트에 들어 있음).
+- **본문에 메타데이터 필드명 노출 금지**: `\`updated:\` date` /
+  `\`created:\` date` 같은 문구가 본문에 들어가면 frontmatter 를
+  볼 수 없는 PDF 독자에겐 dangling reference 가 된다. 본문이
+  "이 문서의 검증 시점" 같은 의미를 담으려면 *실제 날짜를 인라인*
+  한다 — 예: `verified against the current CUBRID source on
+  2026-05-22.` frontmatter `updated:` 를 bump 할 때는 본문의 해당
+  날짜 문장도 같은 PR 에서 손본다 (`grep -n "20\\d\\d-\\d\\d-\\d\\d"
+  <file>.md` 로 한 번에 확인).
 
 호출 예 (스크립트 안에 N27 경로가 하드코딩되어 있음. 다른 프로젝트로
 복제할 때는 `URL_PREFIX` / `OUT_DIR` / `DOCS` 만 수정):
