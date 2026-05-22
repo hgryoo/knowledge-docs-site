@@ -28,7 +28,8 @@
   site-search,
   social-icons,
   theme-select,
-  language-select { display: none !important; }
+  language-select,
+  .pdf-actions { display: none !important; }
 
   html, body, .main-frame, .main-pane, main, .sl-container {
     display: block !important;
