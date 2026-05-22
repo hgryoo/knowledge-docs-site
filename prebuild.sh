@@ -33,6 +33,19 @@ if [[ ! -d "$SRC/code-analysis/cubrid" ]]; then
   exit 1
 fi
 
+# Stash colocated PDFs (output of pdf-export/build-pdf.sh) so the
+# rm-and-rsync cycle does not blow them away. They live next to their
+# source md and are discovered by src/components/PageTitle.astro to
+# render Download buttons. See pdf-export/README.md.
+PDF_STASH="$(mktemp -d)"
+mkdir -p "$PDF_STASH/en" "$PDF_STASH/ko"
+if [[ -d "$EN_DEST" ]]; then
+  find "$EN_DEST" -maxdepth 1 -name '*.pdf' -exec mv {} "$PDF_STASH/en/" \; 2>/dev/null || true
+fi
+if [[ -d "$KO_DEST" ]]; then
+  find "$KO_DEST" -maxdepth 1 -name '*.pdf' -exec mv {} "$PDF_STASH/ko/" \; 2>/dev/null || true
+fi
+
 rm -rf "$EN_DEST" "$KO_DEST"
 mkdir -p "$EN_DEST" "$KO_DEST"
 
@@ -43,6 +56,7 @@ COMMON_EXCLUDES=(
   --exclude='.claude/'
   --exclude='.meta/'
   --exclude='.obsidian/'
+  --exclude='*.link'
 )
 
 echo ">> rsync EN: $SRC/code-analysis/cubrid/ → $EN_DEST/"
@@ -59,6 +73,11 @@ if [[ -d "$SRC/ko/code-analysis/cubrid" ]]; then
 else
   echo "WARN: no $SRC/ko/code-analysis/cubrid — skipping KO tree"
 fi
+
+# Restore the colocated PDFs that were stashed before the wipe.
+find "$PDF_STASH/en" -maxdepth 1 -name '*.pdf' -exec mv {} "$EN_DEST/" \; 2>/dev/null || true
+find "$PDF_STASH/ko" -maxdepth 1 -name '*.pdf' -exec mv {} "$KO_DEST/" \; 2>/dev/null || true
+rm -rf "$PDF_STASH"
 
 echo ">> sanitize frontmatter"
 python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$EN_DEST"
