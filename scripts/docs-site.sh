@@ -5,10 +5,13 @@
 #   docs-site                 # restart (default)
 #   docs-site start           # start if not running
 #   docs-site stop            # stop without restarting
+#   docs-site nuke            # stop + wipe .astro/ content cache + start
 #   docs-site status          # show pid/port/log location
 #   docs-site logs [-f]       # tail the log (add -f to follow)
 #
 # The server is detached via nohup + setsid so it survives shell exit.
+# `nuke` is for when prebuild's rm+rsync cycle leaves .astro/data-store.json
+# in a partial state and stale HTML is served even after a normal restart.
 set -euo pipefail
 
 PROJECT_DIR="/data/hgryoo/knowledge-docs-site"
@@ -66,6 +69,12 @@ case "${1:-restart}" in
   start)   start_server ;;
   stop)    stop_server; echo "docs-site stopped" ;;
   restart|"") stop_server; start_server ;;
+  nuke)
+    stop_server
+    echo "wiping $PROJECT_DIR/.astro/"
+    rm -rf "$PROJECT_DIR/.astro"
+    start_server
+    ;;
   status)
     if is_alive; then
       echo "running (pid $(cat "$PID_FILE")) on :${PORT}"
@@ -83,7 +92,7 @@ case "${1:-restart}" in
     fi
     ;;
   *)
-    echo "usage: docs-site [start|stop|restart|status|logs [-f]]" >&2
+    echo "usage: docs-site [start|stop|restart|nuke|status|logs [-f]]" >&2
     exit 2
     ;;
 esac
