@@ -133,6 +133,10 @@ export default defineConfig({
         },
       ],
       customCss: ['./src/styles/custom.css'],
+      components: {
+        // Append Download PDF buttons after the H1 when colocated PDFs exist.
+        PageTitle: './src/components/PageTitle.astro',
+      },
       head: [
         ...gaHead,
         {

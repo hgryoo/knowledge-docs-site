@@ -1,0 +1,126 @@
+---
+// Starlight PageTitle override — wraps the default H1 and appends a row
+// of Download PDF buttons for every <slug>.<track>.pdf that lives next
+// to the current page's source markdown. The PDFs are produced by
+// pdf-export/build-pdf.sh and survive prebuild.sh thanks to its
+// stash/restore around rm-and-rsync.
+//
+// Discovery uses Vite's import.meta.glob, so every colocated PDF in the
+// content tree is statically known at build time and emitted to dist/
+// with a hashed filename. There is no fs runtime check at request time.
+
+// Mirror of @astrojs/starlight's internal constant. Not exported from
+// the package, so we copy the literal — Starlight uses this id on the
+// page H1 so the in-page "Overview" anchor (`#_top`) keeps working.
+const PAGE_TITLE_ID = '_top';
+
+// All PDFs anywhere under src/content/docs/. Keys are the absolute
+// project-root-relative path (e.g.
+// "/src/content/docs/code-analysis/cubrid/cubrid-lock-manager.slide.pdf");
+// values are the URL Vite assigns the emitted asset.
+const pdfModules = import.meta.glob<string>(
+  '/src/content/docs/**/*.pdf',
+  { eager: true, query: '?url', import: 'default' },
+);
+
+const route = Astro.locals.starlightRoute;
+const entry = route.entry;
+
+// Build the "<dir>/<basename>." prefix that matches every PDF owned by
+// this page. entry.id is the content-collection-relative path (e.g.
+// "code-analysis/cubrid/cubrid-lock-manager" or with a ".md" suffix
+// depending on Astro version); Vite's glob keys are absolute project
+// paths starting with "/src/content/docs/". Strip the extension if
+// present and assemble.
+const cleanId = entry.id.replace(/\.(md|mdx)$/, '');
+const prefix = `/src/content/docs/${cleanId}.`;
+// Match case-insensitively: Astro/Starlight lowercases entry.id (so a
+// directory like N27-lock-manager-improvement appears as n27-... here),
+// but Vite's import.meta.glob keys preserve the filesystem's mixed case.
+// A case-sensitive startsWith would miss every entry whose source path
+// contains an uppercase letter.
+const prefixLower = prefix.toLowerCase();
+
+
+type Pdf = { track: string; url: string };
+const pdfs: Pdf[] = [];
+for (const [fsPath, url] of Object.entries(pdfModules)) {
+  if (!fsPath.toLowerCase().startsWith(prefixLower)) continue;
+  // After the prefix, what remains is "<track>.pdf". Reject anything
+  // with an extra slash so we don't accidentally pick up a PDF in a
+  // child directory that happens to share the prefix.
+  const tail = fsPath.slice(prefix.length);
+  if (tail.includes('/')) continue;
+  if (!tail.toLowerCase().endsWith('.pdf')) continue;
+  pdfs.push({ track: tail.slice(0, -4), url });
+}
+
+// Stable order: slide first, doc second, anything else alphabetical.
+const ORDER: Record<string, number> = { slide: 0, doc: 1 };
+pdfs.sort((a, b) => {
+  const ai = ORDER[a.track] ?? 100 + a.track.charCodeAt(0);
+  const bi = ORDER[b.track] ?? 100 + b.track.charCodeAt(0);
+  return ai - bi;
+});
+
+const trackLabel: Record<string, string> = {
+  slide: 'PDF · slide-tone',
+  doc:   'PDF · doc-tone',
+};
+---
+
+<h1 id={PAGE_TITLE_ID}>{entry.data.title}</h1>
+
+{pdfs.length > 0 && (
+  <div class="pdf-actions" role="group" aria-label="Download PDF">
+    {pdfs.map(({ track, url }) => (
+      <a class="pdf-action" href={url} download>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3a1 1 0 0 1 1 1v8.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 12.586V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1Z"/>
+        </svg>
+        <span>{trackLabel[track] ?? `PDF · ${track}`}</span>
+      </a>
+    ))}
+  </div>
+)}
+
+<style>
+  @layer starlight.core {
+    h1 {
+      margin-top: 1rem;
+      font-size: var(--sl-text-h1);
+      line-height: var(--sl-line-height-headings);
+      font-weight: 600;
+      color: var(--sl-color-white);
+    }
+  }
+  .pdf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  .pdf-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    color: var(--sl-color-gray-2);
+    background: transparent;
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    line-height: 1.2;
+  }
+  .pdf-action:hover,
+  .pdf-action:focus-visible {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent);
+    outline: none;
+  }
+  .pdf-action svg { flex-shrink: 0; }
+  .pdf-action span { letter-spacing: 0.01em; }
+</style>

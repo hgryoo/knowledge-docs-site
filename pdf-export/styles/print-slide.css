@@ -1,0 +1,203 @@
+/* print-slide.css — Track A (slide-tone)
+ *
+ * Pairs with knowledge-slides/themes/cubrid.css. Renders the docs-site
+ * article in the same visual vocabulary as the analysis decks:
+ *  - tangram rainbow strip (via Playwright headerTemplate, not here)
+ *  - navy h1 with red underline, orange h2 left bar, magenta h3
+ *  - blue-bar code blocks, navy header tables, amber blockquote
+ *  - Pretendard / Noto Sans KR throughout
+ *
+ * Loaded by build-pdf.mjs via page.addStyleTag() AFTER the page settles,
+ * so the @media print guard is the only thing keeping screen view intact
+ * if you load this CSS manually for inspection.
+ */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 22mm 18mm 22mm 18mm;
+  }
+
+  /* Strip Starlight chrome. Anything that is not body content goes. */
+  header.header,
+  nav.sidebar,
+  .right-sidebar,
+  .pagination-links,
+  footer.footer,
+  starlight-toc,
+  mobile-starlight-toc,
+  .meta,
+  .sl-flex.action,
+  details > summary[aria-expanded],
+  site-search,
+  social-icons,
+  theme-select,
+  language-select { display: none !important; }
+
+  html, body, .main-frame, .main-pane, main, .sl-container {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-family: 'Pretendard', 'Noto Sans KR', 'Helvetica Neue', Arial, sans-serif !important;
+  }
+
+  .sl-markdown-content {
+    font-size: 10.5pt !important;
+    line-height: 1.55 !important;
+    color: #111111 !important;
+    max-width: none !important;
+  }
+
+  /* Color-keyed headings — mirror cubrid.css palette. */
+  .sl-markdown-content h1 {
+    color: #1A237E !important;
+    font-size: 22pt !important;
+    font-weight: 700 !important;
+    border-bottom: 3px solid #E53935 !important;
+    padding-bottom: 6px !important;
+    margin-top: 0 !important;
+    page-break-before: always;
+  }
+  .sl-markdown-content h1:first-of-type { page-break-before: avoid; }
+
+  .sl-markdown-content h2 {
+    color: #1A237E !important;
+    font-size: 14.5pt !important;
+    font-weight: 700 !important;
+    border-left: 6px solid #F57C00 !important;
+    padding-left: 10px !important;
+    margin-top: 1.6em !important;
+    page-break-after: avoid;
+  }
+
+  .sl-markdown-content h3 {
+    color: #C2185B !important;
+    font-size: 12pt !important;
+    font-weight: 700 !important;
+    margin-top: 1.4em !important;
+    page-break-after: avoid;
+  }
+
+  .sl-markdown-content h4 {
+    color: #1A237E !important;
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+  }
+
+  /* Body paragraphs — keep generous line-height for prose. */
+  .sl-markdown-content p { margin: 0.6em 0 !important; }
+
+  /* Inline code — amber chip with magenta text. */
+  .sl-markdown-content code {
+    background: #FFF8E1 !important;
+    color: #C2185B !important;
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace !important;
+    font-size: 90% !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
+    border: none !important;
+  }
+
+  /* Block code — blue left bar on a near-white slab. */
+  .sl-markdown-content pre,
+  .sl-markdown-content pre code,
+  .expressive-code .frame pre,
+  .expressive-code pre,
+  .expressive-code code {
+    background: #FAFAFA !important;
+    color: #111111 !important;
+    border-left: 4px solid #2196F3 !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace !important;
+    font-size: 8.8pt !important;
+    line-height: 1.45 !important;
+    page-break-inside: avoid;
+  }
+  .expressive-code .frame,
+  .expressive-code .header { background: transparent !important; box-shadow: none !important; }
+
+  /* Tables — navy header row, light gray rules. */
+  .sl-markdown-content table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+    font-size: 9.5pt !important;
+    margin: 0.8em 0 !important;
+  }
+  .sl-markdown-content thead { background: #1A237E !important; }
+  .sl-markdown-content thead th {
+    background: #1A237E !important;
+    color: #ffffff !important;
+    border: 1px solid #1A237E !important;
+    padding: 5px 8px !important;
+    text-align: left !important;
+  }
+  .sl-markdown-content tbody td {
+    border: 1px solid #E0E0E0 !important;
+    padding: 5px 8px !important;
+  }
+  .sl-markdown-content tbody tr:nth-child(even) td { background: #FAFAFA !important; }
+
+  /* Mermaid — keep diagrams as one block on a page. The max-height
+   * fits within one A4 page minus header/footer margin (~253mm content
+   * area); SVG scales down via height:auto/max-width so a tall diagram
+   * shrinks instead of clipping at the page break. */
+  pre.mermaid {
+    border: none !important;
+    background: transparent !important;
+    text-align: center !important;
+    padding: 0.4rem !important;
+    max-height: 230mm !important;
+    overflow: hidden !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  pre.mermaid svg {
+    max-width: 100% !important;
+    max-height: 225mm !important;
+    height: auto !important;
+    width: auto !important;
+  }
+
+  /* Figures: keep caption (italic *Figure N — …* paragraph) with its
+   * image. break-after on the image paragraph + break-before on the
+   * caption paragraph prevents a page-break in between. */
+  .sl-markdown-content p:has(> img) {
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    break-after: avoid;
+  }
+  .sl-markdown-content p:has(> img) + p {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  /* Links — keep blue but drop underlines. Don't print bare URLs. */
+  a, a:visited { color: #2196F3 !important; text-decoration: none !important; }
+  a[href^="http"]:after,
+  a[href^="//"]:after { content: "" !important; }
+
+  /* Blockquote — amber chip. */
+  blockquote {
+    border-left: 4px solid #FFC107 !important;
+    background: #FFFDE7 !important;
+    color: #444 !important;
+    padding: 6px 12px !important;
+    margin: 0.8em 0 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Images — let them shrink, never overflow. */
+  img { max-width: 100% !important; height: auto !important; page-break-inside: avoid; }
+
+  /* List bullets — magenta marker. */
+  .sl-markdown-content ul > li::marker { color: #C2185B !important; }
+  .sl-markdown-content ol > li::marker { color: #1A237E !important; }
+}

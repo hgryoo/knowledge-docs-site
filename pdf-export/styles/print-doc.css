@@ -1,0 +1,195 @@
+/* print-doc.css — Track B (tech-doc-tone)
+ *
+ * Pairs with knowledge-docs-site/src/styles/custom.css (Biome / Knip
+ * neutral palette). Renders the article like a book / technical manual:
+ *   - thin top rule, restrained zinc-gray palette, blue accent
+ *   - serif h1 page breaks, sans-serif body
+ *   - small CUBRID monogram in the footer (via headerTemplate)
+ *
+ * Loaded by build-pdf.mjs via page.addStyleTag() after the page settles.
+ */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 25mm 22mm 25mm 22mm;
+  }
+
+  header.header,
+  nav.sidebar,
+  .right-sidebar,
+  .pagination-links,
+  footer.footer,
+  starlight-toc,
+  mobile-starlight-toc,
+  .meta,
+  .sl-flex.action,
+  details > summary[aria-expanded],
+  site-search,
+  social-icons,
+  theme-select,
+  language-select { display: none !important; }
+
+  html, body, .main-frame, .main-pane, main, .sl-container {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #18181b !important;
+    font-family: 'Inter', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif !important;
+  }
+
+  .sl-markdown-content {
+    font-size: 10pt !important;
+    line-height: 1.65 !important;
+    color: #18181b !important;
+    max-width: none !important;
+  }
+
+  /* Headings — book-like. h1 starts a new page. */
+  .sl-markdown-content h1 {
+    color: #18181b !important;
+    font-size: 19pt !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+    border-bottom: 1px solid #d4d4d8 !important;
+    padding-bottom: 8px !important;
+    margin-top: 0 !important;
+    page-break-before: always;
+  }
+  .sl-markdown-content h1:first-of-type { page-break-before: avoid; }
+
+  .sl-markdown-content h2 {
+    color: #27272a !important;
+    font-size: 13pt !important;
+    font-weight: 600 !important;
+    margin-top: 1.8em !important;
+    page-break-after: avoid;
+  }
+
+  .sl-markdown-content h3 {
+    color: #3f3f46 !important;
+    font-size: 11pt !important;
+    font-weight: 600 !important;
+    margin-top: 1.4em !important;
+    page-break-after: avoid;
+  }
+
+  .sl-markdown-content h4 {
+    color: #52525b !important;
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+  }
+
+  .sl-markdown-content p { margin: 0.55em 0 !important; }
+
+  /* Inline code — light gray chip with subdued blue text. */
+  .sl-markdown-content code {
+    background: #f4f4f5 !important;
+    color: #1e40af !important;
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace !important;
+    font-size: 90% !important;
+    padding: 1px 3px !important;
+    border-radius: 2px !important;
+    border: none !important;
+  }
+
+  /* Block code — gray slab, no border. */
+  .sl-markdown-content pre,
+  .sl-markdown-content pre code,
+  .expressive-code .frame pre,
+  .expressive-code pre,
+  .expressive-code code {
+    background: #f4f4f5 !important;
+    color: #18181b !important;
+    border: 1px solid #e4e4e7 !important;
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    line-height: 1.5 !important;
+    page-break-inside: avoid;
+  }
+  .expressive-code .frame,
+  .expressive-code .header { background: transparent !important; box-shadow: none !important; }
+
+  /* Tables — minimal rules, no fill. */
+  .sl-markdown-content table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+    font-size: 9pt !important;
+    margin: 0.8em 0 !important;
+  }
+  .sl-markdown-content thead th {
+    background: transparent !important;
+    color: #18181b !important;
+    border-bottom: 2px solid #18181b !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    padding: 5px 8px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+  }
+  .sl-markdown-content tbody td {
+    border-bottom: 1px solid #e4e4e7 !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    padding: 5px 8px !important;
+  }
+  .sl-markdown-content tbody tr:last-child td { border-bottom: 1px solid #18181b !important; }
+
+  /* Mermaid — bordered card. max-height fits within one A4 page minus
+   * the larger margins of the doc track (~247mm content); SVG scales
+   * down via height:auto so a tall diagram shrinks rather than clipping
+   * at the page break. */
+  pre.mermaid {
+    border: 1px solid #e4e4e7 !important;
+    background: #ffffff !important;
+    text-align: center !important;
+    padding: 0.8rem !important;
+    max-height: 225mm !important;
+    overflow: hidden !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  pre.mermaid svg {
+    max-width: 100% !important;
+    max-height: 215mm !important;
+    height: auto !important;
+    width: auto !important;
+  }
+
+  /* Figures: keep caption (italic *Figure N — …* paragraph) with its
+   * image. break-after on the image paragraph + break-before on the
+   * caption paragraph prevents a page-break in between. */
+  .sl-markdown-content p:has(> img) {
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    break-after: avoid;
+  }
+  .sl-markdown-content p:has(> img) + p {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  a, a:visited { color: #2563eb !important; text-decoration: none !important; }
+  a[href^="http"]:after,
+  a[href^="//"]:after { content: "" !important; }
+
+  /* Blockquote — italic, subdued gray rule. */
+  blockquote {
+    border-left: 3px solid #a1a1aa !important;
+    background: transparent !important;
+    color: #3f3f46 !important;
+    font-style: italic !important;
+    padding: 4px 14px !important;
+    margin: 0.8em 0 !important;
+    page-break-inside: avoid;
+  }
+
+  img { max-width: 100% !important; height: auto !important; page-break-inside: avoid; }
+}
