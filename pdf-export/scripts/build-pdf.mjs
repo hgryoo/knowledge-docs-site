@@ -4,7 +4,7 @@
 //
 //   node scripts/build-pdf.mjs \
 //     --slug cubrid-lock-manager \
-//     --track slide \
+//     --track cubrid \
 //     --lang en \
 //     --header-left  "CUBRID Code Analysis" \
 //     --header-right "2026-05-21" \
@@ -19,7 +19,7 @@
 //      <pre class="mermaid"> blocks to <svg> (timeout 30s).
 //   5. Injects the print CSS via page.addStyleTag().
 //   6. Calls page.pdf() with A4 + track-specific margins + custom
-//      headerTemplate / footerTemplate. The slide-tone header has a
+//      headerTemplate / footerTemplate. The cubrid-tone header has a
 //      tangram rainbow strip; doc-tone has a thin gray rule.
 //
 // Per-request fields (--header-left etc.) flow into the templates so
@@ -37,7 +37,7 @@ const REPO_ROOT = path.resolve(PDF_ROOT, '..');
 function parseArgs(argv) {
   const out = {
     slug: '',
-    track: 'slide',
+    track: 'cubrid',
     lang: 'en',
     headerLeft: '',
     headerRight: '',
@@ -64,8 +64,8 @@ function parseArgs(argv) {
     console.error('build-pdf.mjs: --slug is required');
     process.exit(2);
   }
-  if (out.track !== 'slide' && out.track !== 'doc') {
-    console.error(`build-pdf.mjs: --track must be slide|doc (got: ${out.track})`);
+  if (out.track !== 'cubrid' && out.track !== 'doc') {
+    console.error(`build-pdf.mjs: --track must be cubrid|doc (got: ${out.track})`);
     process.exit(2);
   }
   return out;
@@ -100,7 +100,7 @@ const TANGRAM_GRADIENT = `linear-gradient(to right,
 function buildHeaderTemplate(args) {
   const left = escapeHtml(args.headerLeft);
   const right = escapeHtml(args.headerRight);
-  if (args.track === 'slide') {
+  if (args.track === 'cubrid') {
     return `
 <div style="font-family: Pretendard, 'Noto Sans KR', sans-serif; width: 100%; box-sizing: border-box; padding: 0 18mm; font-size: 8pt; color: #1A237E;">
   <div style="height: 4px; background: ${TANGRAM_GRADIENT};"></div>
@@ -124,7 +124,7 @@ function buildFooterTemplate(args, logoDataUri) {
   const left = escapeHtml(args.footerLeft);
   const right = escapeHtml(args.footerRight);
   const page = `<span class="pageNumber"></span> / <span class="totalPages"></span>`;
-  if (args.track === 'slide') {
+  if (args.track === 'cubrid') {
     const logo = logoDataUri
       ? `<img src="${logoDataUri}" style="height: 14px; vertical-align: middle; margin-right: 6px;">`
       : '';
@@ -148,7 +148,7 @@ function buildFooterTemplate(args, logoDataUri) {
 }
 
 function pdfMargins(track) {
-  return track === 'slide'
+  return track === 'cubrid'
     ? { top: '22mm', right: '18mm', bottom: '22mm', left: '18mm' }
     : { top: '25mm', right: '22mm', bottom: '25mm', left: '22mm' };
 }

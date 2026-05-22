@@ -3,7 +3,7 @@
 # into a CUBRID-styled PDF. Two visual tracks share the same Astro page;
 # only the print stylesheet differs.
 #
-#   slide  vibrant CUBRID-brand tone (tangram rainbow strip, navy h1
+#   cubrid vibrant CUBRID-brand tone (tangram rainbow strip, navy h1
 #          with red underline). Mirrors knowledge-slides decks.
 #   doc    restrained technical-document tone (Biome / Knip neutral
 #          palette, thin gray rule, book-like h1 page breaks).
@@ -24,7 +24,7 @@
 #   pdf-export/build-pdf.sh <slug> [options]
 #
 # Options:
-#   --track {slide|doc|both}    default: both
+#   --track {cubrid|doc|both}   default: both
 #   --lang  {en|ko}             default: en
 #   --header-left  "TEXT"       per-PDF header left text
 #   --header-right "TEXT"       per-PDF header right text
@@ -77,7 +77,7 @@ if [[ -z "$SLUG" ]]; then
   usage >&2
   exit 2
 fi
-case "$TRACK" in slide|doc|both) ;; *) echo "error: --track must be slide|doc|both" >&2; exit 2 ;; esac
+case "$TRACK" in cubrid|doc|both) ;; *) echo "error: --track must be cubrid|doc|both" >&2; exit 2 ;; esac
 case "$LANG"  in en|ko)           ;; *) echo "error: --lang must be en|ko" >&2; exit 2 ;; esac
 
 cd "$REPO"
@@ -129,9 +129,9 @@ run_track() {
 }
 
 case "$TRACK" in
-  slide) run_track slide ;;
-  doc)   run_track doc ;;
-  both)  run_track slide; run_track doc ;;
+  cubrid) run_track cubrid ;;
+  doc)    run_track doc ;;
+  both)   run_track cubrid; run_track doc ;;
 esac
 
 echo

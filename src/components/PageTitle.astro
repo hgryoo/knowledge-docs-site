@@ -16,7 +16,7 @@ const PAGE_TITLE_ID = '_top';
 
 // All PDFs anywhere under src/content/docs/. Keys are the absolute
 // project-root-relative path (e.g.
-// "/src/content/docs/code-analysis/cubrid/cubrid-lock-manager.slide.pdf");
+// "/src/content/docs/code-analysis/cubrid/cubrid-lock-manager.cubrid.pdf");
 // values are the URL Vite assigns the emitted asset.
 const pdfModules = import.meta.glob<string>(
   '/src/content/docs/**/*.pdf',
@@ -55,8 +55,8 @@ for (const [fsPath, url] of Object.entries(pdfModules)) {
   pdfs.push({ track: tail.slice(0, -4), url });
 }
 
-// Stable order: slide first, doc second, anything else alphabetical.
-const ORDER: Record<string, number> = { slide: 0, doc: 1 };
+// Stable order: cubrid first, doc second, anything else alphabetical.
+const ORDER: Record<string, number> = { cubrid: 0, doc: 1 };
 pdfs.sort((a, b) => {
   const ai = ORDER[a.track] ?? 100 + a.track.charCodeAt(0);
   const bi = ORDER[b.track] ?? 100 + b.track.charCodeAt(0);
@@ -64,8 +64,8 @@ pdfs.sort((a, b) => {
 });
 
 const trackLabel: Record<string, string> = {
-  slide: 'PDF · slide-tone',
-  doc:   'PDF · doc-tone',
+  cubrid: 'PDF · cubrid-tone',
+  doc:    'PDF · doc-tone',
 };
 ---
 
