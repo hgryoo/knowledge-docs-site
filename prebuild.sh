@@ -59,6 +59,19 @@ COMMON_EXCLUDES=(
   --exclude='*.link'
 )
 
+DOCS_ONLY_FILTER=(
+  --include='*/'
+  --include='*.md'
+  --include='*.pdf'
+  --include='*.png'
+  --include='*.jpg'
+  --include='*.jpeg'
+  --include='*.svg'
+  --include='*.gif'
+  --include='*.webp'
+  --exclude='*'
+)
+
 echo ">> rsync EN: $SRC/code-analysis/cubrid/ → $EN_DEST/"
 rsync -a "${COMMON_EXCLUDES[@]}" "$SRC/code-analysis/cubrid/" "$EN_DEST/"
 
@@ -113,12 +126,12 @@ if [[ -f "$LOCAL_CONF" ]]; then
         if [[ -d "$src/$sub" ]]; then
           mkdir -p "$dest_full/$sub"
           echo ">> rsync LOCAL $dest/$sub  ←  $src/$sub"
-          rsync -a "${COMMON_EXCLUDES[@]}" "$src/$sub/" "$dest_full/$sub/"
+          rsync -a "${COMMON_EXCLUDES[@]}" "${DOCS_ONLY_FILTER[@]}" "$src/$sub/" "$dest_full/$sub/"
         fi
       done
     else
       echo ">> rsync LOCAL $dest  ←  $src"
-      rsync -a "${COMMON_EXCLUDES[@]}" "$src/" "$dest_full/"
+      rsync -a "${COMMON_EXCLUDES[@]}" "${DOCS_ONLY_FILTER[@]}" "$src/" "$dest_full/"
     fi
     python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$dest_full"
     python3 "$SCRIPT_DIR/scripts/quote_list_items.py" "$dest_full"
