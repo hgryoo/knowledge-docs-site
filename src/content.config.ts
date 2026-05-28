@@ -22,6 +22,13 @@ const kbExtensions = z.object({
   created: z.union([z.string(), z.date()]).optional(),
   updated: z.union([z.string(), z.date()]).optional(),
   tags: z.array(z.string()).optional(),
+  // Force-attach colocated PDFs whose filename stem does NOT match this
+  // page's slug (PageTitle's auto-discovery only finds <slug>.<track>.pdf).
+  // Use for merged/combined PDFs — e.g. 01-survey-series.cubrid.pdf is the
+  // combined export of the 01-xx survey docs and has no 01-survey-series.md
+  // host of its own, so the overview page claims it explicitly. Values are
+  // filenames relative to the page's own directory.
+  extra_pdfs: z.array(z.string()).optional(),
 });
 
 // The KB's auto-generated README.md files have no frontmatter (and therefore

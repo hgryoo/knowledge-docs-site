@@ -55,6 +55,27 @@ for (const [fsPath, url] of Object.entries(pdfModules)) {
   pdfs.push({ track: tail.slice(0, -4), url });
 }
 
+// Force-attached PDFs declared in frontmatter (extra_pdfs). These are
+// merged/combined exports whose filename stem doesn't match any page
+// slug, so auto-discovery above never finds them. Each value is a
+// filename in this page's own directory; resolve it against pdfModules
+// case-insensitively (glob keys preserve fs case, entry.id is lowercased)
+// and derive the track from the trailing ".<track>.pdf" segment.
+const pageDir = cleanId.includes('/') ? cleanId.slice(0, cleanId.lastIndexOf('/')) : '';
+const extraPdfs = Array.isArray(entry.data.extra_pdfs) ? entry.data.extra_pdfs : [];
+for (const fname of extraPdfs) {
+  if (typeof fname !== 'string' || !fname.toLowerCase().endsWith('.pdf')) continue;
+  const wantLower = `/src/content/docs/${pageDir}/${fname}`.toLowerCase();
+  const match = Object.entries(pdfModules).find(
+    ([fsPath]) => fsPath.toLowerCase() === wantLower,
+  );
+  if (!match) continue;
+  const stem = fname.slice(0, -4); // strip ".pdf"
+  const dot = stem.lastIndexOf('.');
+  const track = dot >= 0 ? stem.slice(dot + 1) : stem;
+  pdfs.push({ track, url: match[1] });
+}
+
 // Stable order: cubrid first, doc second, anything else alphabetical.
 const ORDER: Record<string, number> = { cubrid: 0, doc: 1 };
 pdfs.sort((a, b) => {
