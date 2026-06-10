@@ -1,8 +1,28 @@
 ---
 title: 코드 분석
-description: CUBRID 내부 모듈별 딥다이브.
+description: CUBRID와 PostgreSQL 내부 모듈별 딥다이브.
 ---
 
-CUBRID 모듈 단위 분석서 — 소스와 함께 읽도록 쓰여진 글입니다. 전체 카탈로그는
-[영문 overview](../../code-analysis/) 를 참고하세요. 사이드바에서 모든 모듈을
-바로 열 수 있습니다.
+import CodeAnalysisIndex from '../../../../components/CodeAnalysisIndex.astro';
+
+오픈소스 DBMS 내부를 소스 레벨에서 읽는 분석서 — 현재 CUBRID와 PostgreSQL
+코드베이스를 다루며, 두 프로젝트 모두 같은 영역 구분으로 묶여 있습니다.
+
+## CUBRID
+
+CUBRID 코드베이스를 소스 레벨에서 읽는다 — 스토리지, MVCC, 락 매니저, 복구,
+질의 파이프라인, 복제/HA, 그리고 PL 계열.
+
+**먼저 읽기:** [아키텍처 개요](cubrid/cubrid-architecture-overview/)
+
+<CodeAnalysisIndex project="cubrid" locale="ko" />
+
+## PostgreSQL
+
+PostgreSQL 백엔드(REL_18)를 모듈 단위로 읽는다 — 공유 메모리 프로세스 모델,
+WAL 내구성 축, 스토리지와 플러거블 액세스 메서드, 플래너/익스큐터 파이프라인,
+카탈로그/캐시 계층, 복제, 확장성 표면, 그리고 버전 진화 문서까지.
+
+**먼저 읽기:** [아키텍처 개요](postgres/postgres-architecture-overview/)
+
+<CodeAnalysisIndex project="postgres" locale="ko" />

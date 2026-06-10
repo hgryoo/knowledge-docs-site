@@ -13,6 +13,8 @@ dist/
 # Always regenerated; never tracked.
 src/content/docs/code-analysis/cubrid/
 src/content/docs/ko/code-analysis/cubrid/
+src/content/docs/code-analysis/postgres/
+src/content/docs/ko/code-analysis/postgres/
 
 # Local-only trees rsync'd per local-trees.conf.
 # Developer machine only; not present (and not built) in CI.

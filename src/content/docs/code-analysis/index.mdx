@@ -1,12 +1,29 @@
 ---
 title: Code Analysis
-description: Module-by-module deep dives into CUBRID's internals.
+description: Module-by-module deep dives into CUBRID and PostgreSQL internals.
 ---
 
 import CodeAnalysisIndex from '../../../components/CodeAnalysisIndex.astro';
 
-Open-source DBMS internals — currently a line-by-line read of the CUBRID
-codebase, broken down by storage, MVCC, lock manager, and the layers around
-them.
+Open-source DBMS internals read at the source level — currently the CUBRID
+and PostgreSQL codebases, grouped by area the same way for each project.
 
-<CodeAnalysisIndex />
+## CUBRID
+
+A source-level read of the CUBRID codebase — storage, MVCC, lock manager,
+recovery, the query pipeline, replication/HA, and the PL family.
+
+**Start here:** [architecture overview](cubrid/cubrid-architecture-overview/)
+
+<CodeAnalysisIndex project="cubrid" />
+
+## PostgreSQL
+
+A module-by-module read of the PostgreSQL backend (REL_18) — the
+shared-memory process model, the WAL durability spine, storage and pluggable
+access methods, the planner/executor pipeline, the catalog/cache layer,
+replication, the extensibility surface, plus version-evolution docs.
+
+**Start here:** [architecture overview](postgres/postgres-architecture-overview/)
+
+<CodeAnalysisIndex project="postgres" />

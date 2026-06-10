@@ -1,0 +1,155 @@
+---
+import { getCollection } from 'astro:content';
+
+// Project chooser cards for the homepage — mirrors the per-project cards
+// knowledge-base-site's generate_index.py emits on its landing page
+// (label, live doc count, blurb, "start here" pointer, enter/other-language
+// links). Counts come from the content collection so they never go stale.
+
+interface Props {
+  locale?: 'en' | 'ko';
+}
+
+const { locale = 'en' } = Astro.props;
+
+// Keep label/blurb/arch in sync with PROJECT_META in knowledge-base-site's
+// scripts/generate_index.py (KO blurbs are this site's own translations).
+const PROJECTS = [
+  {
+    slug: 'cubrid',
+    label: 'CUBRID',
+    arch: 'cubrid-architecture-overview',
+    blurb: {
+      en: 'A source-level read of the CUBRID codebase — storage, MVCC, lock manager, recovery, the query pipeline, replication/HA, and the PL family.',
+      ko: 'CUBRID 코드베이스를 소스 레벨에서 읽는다 — 스토리지, MVCC, 락 매니저, 복구, 질의 파이프라인, 복제/HA, 그리고 PL 계열.',
+    },
+  },
+  {
+    slug: 'postgres',
+    label: 'PostgreSQL',
+    arch: 'postgres-architecture-overview',
+    blurb: {
+      en: 'A module-by-module read of the PostgreSQL backend (REL_18) — the shared-memory process model, the WAL durability spine, storage and pluggable access methods, the planner/executor pipeline, the catalog/cache layer, replication, the extensibility surface, plus version-evolution docs.',
+      ko: 'PostgreSQL 백엔드(REL_18)를 모듈 단위로 읽는다 — 공유 메모리 프로세스 모델, WAL 내구성 축, 스토리지와 플러거블 액세스 메서드, 플래너/익스큐터 파이프라인, 카탈로그/캐시 계층, 복제, 확장성 표면, 그리고 버전 진화 문서까지.',
+    },
+  },
+];
+
+const all = await getCollection('docs');
+const localePrefix = locale === 'ko' ? 'ko/' : '';
+const otherPrefix = locale === 'ko' ? '' : 'ko/';
+
+const count = (slug: string) =>
+  all.filter((e) => e.id.startsWith(`${localePrefix}code-analysis/${slug}/`))
+    .length;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const t =
+  locale === 'ko'
+    ? {
+        docs: '개 문서',
+        start: '먼저 읽기:',
+        startLink: '아키텍처 개요',
+        enter: '분석 보기 →',
+        otherLang: 'English',
+      }
+    : {
+        docs: ' docs',
+        start: 'Start here:',
+        startLink: 'architecture overview',
+        enter: 'Enter analysis →',
+        otherLang: '한국어',
+      };
+
+const cards = PROJECTS.map((p) => ({
+  ...p,
+  count: count(p.slug),
+  blurbText: p.blurb[locale],
+  // "Enter analysis" lands on the project's section of the code-analysis
+  // index (anchored by the H2 heading id, e.g. #cubrid / #postgresql).
+  enterHref: `${base}/${localePrefix}code-analysis/#${p.label.toLowerCase()}`,
+  archHref: `${base}/${localePrefix}code-analysis/${p.slug}/${p.arch}/`,
+  otherHref: `${base}/${otherPrefix}code-analysis/#${p.label.toLowerCase()}`,
+}));
+---
+
+<div class="pc-grid">
+  {cards.map((c) => (
+    <div class="pc-card">
+      <h3 class="pc-title">
+        <a href={c.enterHref}>{c.label}</a>{' '}
+        <span class="pc-count">{c.count}{t.docs}</span>
+      </h3>
+      <p class="pc-blurb">{c.blurbText}</p>
+      <div class="pc-start">
+        {t.start} <a href={c.archHref}>{t.startLink}</a>
+      </div>
+      <div class="pc-links">
+        <a class="pc-enter" href={c.enterHref}>{t.enter}</a>
+        <a class="pc-other" href={c.otherHref}>{t.otherLang}</a>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .pc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.1rem;
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+
+  .pc-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 10px;
+    padding: 1.3rem 1.45rem;
+    background: var(--sl-color-bg-nav);
+  }
+
+  .pc-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.4rem;
+    font-family: var(--kb-font-serif);
+    font-weight: 500;
+  }
+
+  .pc-count {
+    color: var(--sl-color-gray-3);
+    font-size: 0.8rem;
+    font-weight: 400;
+  }
+
+  .pc-blurb {
+    margin: 0.2rem 0 1rem;
+    color: var(--sl-color-gray-2);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .pc-start {
+    font-size: 0.82rem;
+    color: var(--sl-color-gray-3);
+    margin-bottom: 0.85rem;
+  }
+
+  .pc-links {
+    margin-top: auto;
+    display: flex;
+    gap: 1.1rem;
+    align-items: baseline;
+  }
+
+  .pc-enter {
+    font-weight: 600;
+  }
+
+  .pc-other {
+    font-size: 0.82rem;
+    color: var(--sl-color-gray-3);
+  }
+</style>

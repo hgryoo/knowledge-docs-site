@@ -2,22 +2,23 @@
 import { getCollection } from 'astro:content';
 
 // Mirrors knowledge-base-site's generate_index.py:
-// reads frontmatter from every code-analysis/cubrid/*.md, groups by
+// reads frontmatter from every code-analysis/<project>/*.md, groups by
 // `subcategory:`, and emits a jumplist + per-subcategory bullet list.
+// Parameterized by project (cubrid | postgres) and locale (en | ko) so the
+// same component renders each project section on both language indexes.
 
-type SubcatSlug =
-  | 'overview'
-  | 'base-infra'
-  | 'storage-engine'
-  | 'txn-recovery'
-  | 'query-processing'
-  | 'ddl-schema'
-  | 'replication-ha'
-  | 'pl-language'
-  | 'server-architecture'
-  | 'i18n-specialty';
+interface Props {
+  project: string;
+  locale?: 'en' | 'ko';
+}
 
-const ORDER: Array<[SubcatSlug, string]> = [
+const { project, locale = 'en' } = Astro.props;
+
+// Subcategory display order + labels — the UNION across projects, kept
+// identical to CODE_ANALYSIS_SUBCATS in knowledge-base-site's
+// generate_index.py. A project simply omits the buckets it does not use;
+// docs whose `subcategory:` is not listed fall through to "Other".
+const ORDER: Array<[string, string]> = [
   ['overview',            'Overview & Reading Paths'],
   ['base-infra',          'Base / Infrastructure'],
   ['storage-engine',      'Storage Engine'],
@@ -25,13 +26,21 @@ const ORDER: Array<[SubcatSlug, string]> = [
   ['query-processing',    'Query Processing'],
   ['ddl-schema',          'DDL & Schema'],
   ['replication-ha',      'Replication & HA'],
-  ['pl-language',         'Procedural Language'],
   ['server-architecture', 'Server Architecture'],
+  ['system-catalog',      'System Catalog'],
+  ['monitoring-stats',    'Monitoring & Statistics'],
+  ['client-protocol',     'Client Protocol'],
+  ['extensibility',       'Extensibility'],
+  ['pl-language',         'Procedural Language'],
+  ['i18n-text',           'Internationalization & Text'],
   ['i18n-specialty',      'Internationalization & Specialty'],
+  ['utilities',           'Utilities'],
+  ['evolution',           'Version Evolution'],
 ];
 
 const all = await getCollection('docs');
-const prefix = 'code-analysis/cubrid/';
+const localePrefix = locale === 'ko' ? 'ko/' : '';
+const prefix = `${localePrefix}code-analysis/${project}/`;
 
 type Entry = {
   slug: string;
@@ -43,7 +52,6 @@ type Entry = {
 const entries: Entry[] = [];
 for (const e of all) {
   if (!e.id.startsWith(prefix)) continue;
-  if (e.id.startsWith('ko/')) continue;
   const slug = e.id.slice(prefix.length);
   if (!slug || slug.includes('/')) continue;
   entries.push({
@@ -56,7 +64,8 @@ for (const e of all) {
 entries.sort((a, b) => a.slug.localeCompare(b.slug));
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const href = (slug: string) => `${base}/code-analysis/cubrid/${slug}/`;
+const href = (slug: string) =>
+  `${base}/${localePrefix}code-analysis/${project}/${slug}/`;
 
 const buckets = new Map<string, Entry[]>();
 const validSlugs = new Set(ORDER.map(([s]) => s));
@@ -78,19 +87,25 @@ function slugify(label: string): string {
     .replace(/\s+/g, '-');
 }
 
+// Anchor ids are prefixed with the project so two instances of this
+// component can coexist on the same index page without collisions.
+const anchor = (heading: string) => `${project}-${slugify(heading)}`;
+
+const jumpLabel = locale === 'ko' ? '바로가기:' : 'Jump to:';
+
 const chips: Array<{ label: string; href: string }> = [];
 for (const [slug, label] of ORDER) {
   const bucket = buckets.get(slug);
   if (!bucket || bucket.length === 0) continue;
   chips.push({
     label,
-    href: `#${slugify(`${label} (${bucket.length})`)}`,
+    href: `#${anchor(`${label} (${bucket.length})`)}`,
   });
 }
 ---
 
 <p class="ca-jump">
-  <strong>Jump to:</strong>{' '}
+  <strong>{jumpLabel}</strong>{' '}
   {chips.map((c, i) => (
     <>
       {i > 0 && ' · '}
@@ -103,10 +118,9 @@ for (const [slug, label] of ORDER) {
   const bucket = buckets.get(slug);
   if (!bucket || bucket.length === 0) return null;
   const heading = `${label} (${bucket.length})`;
-  const id = slugify(heading);
   return (
     <section class="ca-section">
-      <h3 id={id}>{heading}</h3>
+      <h3 id={anchor(heading)}>{heading}</h3>
       <ul class="ca-list">
         {bucket.map((e) => (
           <li>
@@ -126,7 +140,7 @@ for (const [slug, label] of ORDER) {
 
 {untagged.length > 0 && (
   <section class="ca-section">
-    <h3>Other ({untagged.length})</h3>
+    <h3 id={anchor(`Other (${untagged.length})`)}>Other ({untagged.length})</h3>
     <ul class="ca-list">
       {untagged.map((e) => (
         <li>

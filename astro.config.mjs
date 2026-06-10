@@ -122,7 +122,23 @@ export default defineConfig({
         {
           label: 'Code Analysis',
           translations: { ko: '코드 분석' },
-          autogenerate: { directory: 'code-analysis' },
+          items: [
+            {
+              label: 'Overview',
+              translations: { ko: '개요' },
+              slug: 'code-analysis',
+            },
+            {
+              label: 'CUBRID',
+              collapsed: true,
+              autogenerate: { directory: 'code-analysis/cubrid' },
+            },
+            {
+              label: 'PostgreSQL',
+              collapsed: true,
+              autogenerate: { directory: 'code-analysis/postgres' },
+            },
+          ],
         },
         ...localSidebarEntries,
         {

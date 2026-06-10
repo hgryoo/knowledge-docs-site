@@ -4,7 +4,7 @@ description: Long-form notes, code analyses, and references on DBMS internals.
 template: splash
 hero:
   title: Notes &amp; Analyses
-  tagline: Long-form notes and code analyses on DBMS internals. Storage, MVCC, lock manager, and similar core modules — read at a line-by-line level. Currently centered on CUBRID.
+  tagline: Long-form notes and code analyses on DBMS internals. Storage, MVCC, lock manager, and similar core modules — read at a line-by-line level. Covering the CUBRID and PostgreSQL codebases.
   actions:
     - text: Browse code analysis
       link: code-analysis/
@@ -17,3 +17,12 @@ hero:
       link: https://hgryoo.dev/cubrid-doxygen/
       icon: external
 ---
+
+import ProjectCards from '../../components/ProjectCards.astro';
+
+## Code Analysis
+
+Open-source DBMS internals read at the source level, one project per card —
+pick one to dive into its full analysis tree:
+
+<ProjectCards />
