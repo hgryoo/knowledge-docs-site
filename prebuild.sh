@@ -20,6 +20,19 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC="${SRC:-$SCRIPT_DIR/../knowledge-base/knowledge}"
 
+# Bootstrap the gitignored local-trees marker so astro.config.mjs's static
+# import of it resolves on fresh checkouts (CI included). ESM imports are
+# hoisted, so the config file cannot create the marker before importing it
+# — it has to exist before astro loads the config, i.e. here. See
+# scripts/refresh-local-trees.sh, which rewrites it on every refresh.
+MARKER="$SCRIPT_DIR/local-trees-marker.mjs"
+if [[ ! -f "$MARKER" ]]; then
+  {
+    echo "// Auto-generated bootstrap. See scripts/refresh-local-trees.sh."
+    echo "export const LAST_REFRESH = '$(date -u +%Y-%m-%dT%H:%M:%SZ)';"
+  } > "$MARKER"
+fi
+
 # Analysis projects to publish, one directory per project under
 # $SRC/code-analysis/. Keep in sync with the sidebar groups in
 # astro.config.mjs and the project sections in code-analysis/index.mdx.

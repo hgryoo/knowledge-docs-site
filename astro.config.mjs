@@ -7,22 +7,12 @@ import fs from 'node:fs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
-// Bootstrap the local-trees marker file if missing so the static import
-// below can resolve on fresh checkouts. The marker is gitignored and
-// rewritten on every refresh-local-trees.sh run; its content change is
-// what wakes up the dev-server's config watcher when a new local tree
-// is added. See scripts/refresh-local-trees.sh.
-const markerPath = path.join(here, 'local-trees-marker.mjs');
-if (!fs.existsSync(markerPath)) {
-  fs.writeFileSync(
-    markerPath,
-    `// Auto-generated bootstrap. See scripts/refresh-local-trees.sh.\n` +
-      `export const LAST_REFRESH = '${new Date().toISOString()}';\n`,
-    'utf-8',
-  );
-}
 // Static import: registers local-trees-marker.mjs in vite's config-file
-// watch graph so rewriting it triggers a server restart.
+// watch graph so rewriting it triggers a server restart. The marker is
+// gitignored and bootstrapped by prebuild.sh (ESM imports are hoisted, so
+// this file cannot create it before importing it — on a fresh checkout it
+// must already exist when the config loads); refresh-local-trees.sh
+// rewrites it so the dev server reloads when a new local tree is added.
 import { LAST_REFRESH as _LAST_REFRESH } from './local-trees-marker.mjs';
 void _LAST_REFRESH;
 const kbRepo = path.resolve(here, '../knowledge-base');
