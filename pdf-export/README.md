@@ -90,6 +90,43 @@ node /data/hgryoo/knowledge-docs-site/pdf-export/scripts/render-roadmap.mjs
 한다. 스크립트는 이 dev 서버에 붙어 페이지마다 Playwright + print-cubrid.css
 를 적용해 `<slug>.cubrid.pdf` 를 소스 md 옆에 떨어뜨린다.
 
+## 임의 docs-site 페이지 → PDF (`render-doc.mjs`)
+
+`render-roadmap.mjs` 는 DOCS 목록·URL·OUT_DIR 이 N27 전용으로 하드코딩돼
+있다. cubrid_cv 의 `issue/<I*>/DESIGN.md`, `plan/<feature>/` 같은
+**임의의 local-tree 페이지 한 장**을 PDF 로 뽑을 때는 일반화 진입점
+`scripts/render-doc.mjs` 를 쓴다. strip(Open Questions / Review Log
+섹션 제거) · tangram 헤더 · hgryoo 푸터 · mermaid/lazy-image 게이트는
+roadmap 스크립트와 동일하고, 페이지 URL·출력 경로·헤더 텍스트만
+플래그로 받는다.
+
+```bash
+# dev 서버(127.0.0.1:9998)가 떠 있어야 한다. cubrid_cv 는 prebuild 가
+# src/content/docs/local/cubrid_cv/ 로 복사하므로, 소스 md 를 고쳤으면
+# 먼저 그 사본을 동기화한다 (단건이면 cp, 전체면 scripts/refresh-local-trees.sh).
+cp /data/cubrid_cv/issue/I4_*/DESIGN.md \
+   src/content/docs/local/cubrid_cv/issue/I4_*/DESIGN.md
+
+node pdf-export/scripts/render-doc.mjs \
+  --url  /local/cubrid_cv/issue/i4_2026-05-20_lock_perform_object_refactor/design/ \
+  --out  /data/cubrid_cv/issue/I4_2026-05-20_lock_perform_object_refactor/DESIGN.pdf \
+  --header "CUBRID Lock Manager · lock_internal_perform_lock_object Refactor Design"
+```
+
+주의할 점:
+
+- **URL 슬러그는 소문자.** Starlight 가 경로 세그먼트를 소문자화하므로
+  `I4_…` 폴더는 URL 에서 `i4_…`, `DESIGN.md` 는 `design/` 이 된다.
+- **`Open Questions` 는 strip 으로도 제거되지만**, 소스 md 에서 이미
+  지웠으면 strip 이 no-op (`drop=[]`) 으로 통과한다 — 둘 중 한 군데만
+  해도 PDF 에는 안 나온다. 소스를 그대로 두고 PDF 에서만 빼고 싶으면
+  소스를 손대지 말고 strip 에 맡긴다 (`--no-strip` 으로 끌 수도 있음).
+- **번호 없는 h2 는 page-break 가 안 붙는다.** roadmap 문서는 `## N.`
+  꼴이라 섹션마다 새 페이지로 떨어지지만, 설계서처럼 `## Context …`
+  꼴이면 자연스럽게 흐른다 (`break=[]`).
+- 출력 PDF 는 소스 md 옆에 떨어진다. docs-site 다운로드 버튼까지
+  최신으로 맞추려면 같은 파일을 마운트 사본 자리에도 `cp` 한다.
+
 ## 왜 이렇게 만들었나 (재사용을 위한 결정 로그)
 
 ### 결정 1 — Playwright 한 가지로 두 트랙 처리

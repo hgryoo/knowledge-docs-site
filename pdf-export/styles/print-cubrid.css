@@ -165,6 +165,17 @@
     height: auto !important;
     width: auto !important;
   }
+  /* Mermaid renders htmlLabels as <div><span class="nodeLabel"><p>…</p></span></div>
+   * inside a <foreignObject> whose height was fixed at render time. The body
+   * `.sl-markdown-content p { margin }` rule above leaks into those <p>s, pushing
+   * the text past the fixed foreignObject height so node/cluster labels clip.
+   * Reset spacing inside mermaid so labels keep the geometry mermaid measured. */
+  pre.mermaid foreignObject p,
+  pre.mermaid foreignObject div,
+  pre.mermaid foreignObject span {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
   /* Figures: keep caption (italic *Figure N — …* paragraph) with its
    * image. break-after on the image paragraph + break-before on the
