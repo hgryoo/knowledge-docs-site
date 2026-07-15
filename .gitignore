@@ -19,6 +19,7 @@ src/content/docs/ko/code-analysis/postgres/
 # Local-only trees rsync'd per local-trees.conf.
 # Developer machine only; not present (and not built) in CI.
 src/content/docs/local/
+src/content/docs/ko/local/
 
 # Per-machine list of local trees to materialize. See
 # local-trees.conf.example for the format.

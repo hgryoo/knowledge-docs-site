@@ -68,6 +68,38 @@ DOCS_ONLY_FILTER=(
   --exclude='*'
 )
 
+# KO mirror of the local trees. cubrid_cv (and any other local tree that
+# follows the vault's bilingual convention) colocates the Korean version of
+# each doc as a foo_ko.md sibling, not in a separate ko/ source dir. The EN
+# rsync uses COMMON_EXCLUDES, which drops every *_ko.md to keep the root tree
+# English-only; this pair of filters does the inverse — keep only the *_ko.md
+# markdown (plus shared figures) and drop the EN .md — so the loop can build a
+# parallel ko/local/ tree. The _ko suffix is stripped after rsync (see below)
+# so each ko/local/<dest>/<path>.md lines up slug-for-slug with its English
+# sibling under local/<dest>, which is what Starlight i18n needs to pair them
+# under the 한국어 locale. Same split the code-analysis trees use above.
+KO_LOCAL_EXCLUDES=(
+  --exclude='CLAUDE.md'
+  --exclude='.omc/'
+  --exclude='.claude/'
+  --exclude='.meta/'
+  --exclude='.obsidian/'
+  --exclude='*.link'
+)
+KO_DOCS_FILTER=(
+  --include='*/'
+  --include='*_ko.md'
+  --exclude='*.md'
+  --include='*.pdf'
+  --include='*.png'
+  --include='*.jpg'
+  --include='*.jpeg'
+  --include='*.svg'
+  --include='*.gif'
+  --include='*.webp'
+  --exclude='*'
+)
+
 for proj in "${PROJECTS[@]}"; do
   if [[ ! -d "$SRC/code-analysis/$proj" ]]; then
     echo "ERROR: $SRC/code-analysis/$proj not found in source" >&2
@@ -104,6 +136,21 @@ for proj in "${PROJECTS[@]}"; do
     rsync -a --copy-unsafe-links \
       "${COMMON_EXCLUDES[@]}" \
       "$SRC/ko/code-analysis/$proj/" "$KO_DEST/"
+
+    # Self-heal missing KO figures. The KO mirror is expected to carry a
+    # <doc>.assets symlink per EN <doc>.assets (dereferenced above). When a
+    # KO doc is added without its symlink, its ![](<doc>.assets/...) refs
+    # would 404 at astro build ("Could not find requested image ..."). Fill
+    # any EN assets dir absent on the KO side by copying the real EN figures,
+    # so the build never breaks on a source-side symlink gap.
+    for en_assets in "$EN_DEST"/*.assets; do
+      [[ -d "$en_assets" ]] || continue
+      ko_assets="$KO_DEST/$(basename "$en_assets")"
+      if [[ ! -d "$ko_assets" ]]; then
+        echo ">> heal KO assets: $(basename "$en_assets") ← EN"
+        cp -aL "$en_assets" "$ko_assets"
+      fi
+    done
   else
     echo "WARN: no $SRC/ko/code-analysis/$proj — skipping KO tree"
   fi
@@ -123,7 +170,8 @@ done
 # Missing src dirs are skipped silently, so CI hosts (where the file is
 # absent or paths don't exist) are unaffected.
 LOCAL_ROOT="$SCRIPT_DIR/src/content/docs/local"
-rm -rf "$LOCAL_ROOT"
+KO_LOCAL_ROOT="$SCRIPT_DIR/src/content/docs/ko/local"
+rm -rf "$LOCAL_ROOT" "$KO_LOCAL_ROOT"
 
 LOCAL_CONF="$SCRIPT_DIR/local-trees.conf"
 if [[ -f "$LOCAL_CONF" ]]; then
@@ -141,6 +189,7 @@ if [[ -f "$LOCAL_CONF" ]]; then
       continue
     fi
     dest_full="$LOCAL_ROOT/$dest"
+    ko_dest_full="$KO_LOCAL_ROOT/$dest"
     mkdir -p "$dest_full"
     if [[ -n "${subdirs:-}" ]]; then
       IFS=',' read -r -a sub_arr <<< "$subdirs"
@@ -149,11 +198,15 @@ if [[ -f "$LOCAL_CONF" ]]; then
           mkdir -p "$dest_full/$sub"
           echo ">> rsync LOCAL $dest/$sub  ←  $src/$sub"
           rsync -a "${COMMON_EXCLUDES[@]}" "${DOCS_ONLY_FILTER[@]}" "$src/$sub/" "$dest_full/$sub/"
+          mkdir -p "$ko_dest_full/$sub"
+          rsync -a "${KO_LOCAL_EXCLUDES[@]}" "${KO_DOCS_FILTER[@]}" "$src/$sub/" "$ko_dest_full/$sub/"
         fi
       done
     else
       echo ">> rsync LOCAL $dest  ←  $src"
       rsync -a "${COMMON_EXCLUDES[@]}" "${DOCS_ONLY_FILTER[@]}" "$src/" "$dest_full/"
+      mkdir -p "$ko_dest_full"
+      rsync -a "${KO_LOCAL_EXCLUDES[@]}" "${KO_DOCS_FILTER[@]}" "$src/" "$ko_dest_full/"
     fi
     python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$dest_full"
     python3 "$SCRIPT_DIR/scripts/quote_list_items.py" "$dest_full"
@@ -166,6 +219,25 @@ if [[ -f "$LOCAL_CONF" ]]; then
     # local-trees.conf.
     if [[ "$dest" == cub_sys* || "$dest" == cubrid_cv* ]]; then
       python3 "$SCRIPT_DIR/scripts/inject_sidebar_label.py" "$dest_full"
+    fi
+
+    # KO mirror: rename foo_ko.md → foo.md so the slug under ko/local/<dest>
+    # matches its English sibling under local/<dest>; Starlight then pairs the
+    # two under the 한국어 locale and the language switcher links them. Trees
+    # with no *_ko.md siblings (e.g. cub_sys, knowledge-slides) leave an empty
+    # ko_dest_full, which we drop so no stray locale dirs reach the build.
+    find "$ko_dest_full" -type f -name '*_ko.md' -print0 \
+      | while IFS= read -r -d '' f; do mv "$f" "${f%_ko.md}.md"; done
+    ko_md_count=$(find "$ko_dest_full" -type f -name '*.md' 2>/dev/null | wc -l)
+    if [[ "$ko_md_count" -gt 0 ]]; then
+      python3 "$SCRIPT_DIR/scripts/sanitize_frontmatter.py" "$ko_dest_full"
+      python3 "$SCRIPT_DIR/scripts/quote_list_items.py" "$ko_dest_full"
+      python3 "$SCRIPT_DIR/scripts/inject_title.py" "$ko_dest_full"
+      if [[ "$dest" == cub_sys* || "$dest" == cubrid_cv* ]]; then
+        python3 "$SCRIPT_DIR/scripts/inject_sidebar_label.py" "$ko_dest_full"
+      fi
+    else
+      rm -rf "$ko_dest_full"
     fi
   done
 fi
