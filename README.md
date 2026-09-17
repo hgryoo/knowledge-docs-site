@@ -80,6 +80,36 @@ the deck listing — both via the hero "View slides ↗" action and the
 sidebar "Slides ↗" item. There is no in-site deck index here; the
 standalone site already owns that view.
 
+## Standalone HTML documents
+
+Some sources are a finished HTML document rather than markdown — e.g.
+cubrid_cv's `plan/lock_manager/book/book.html`, a pandoc build that packs a
+whole book (chapter nav, inlined SVG figures) into one self-contained file.
+Astro's content collection only loads md/mdx, so these used to be dropped by
+the rsync filters and were invisible here.
+
+They now get the same treatment as markdown: a sidebar entry where the file
+sits in its tree, opening in the main panel as an iframe with an
+"open in new tab" link above it.
+
+Opt in per tree, with the 4th field of a `local-trees.conf` entry — globs
+relative to the tree root, `**/*.html` if you want all of them:
+
+```bash
+"cubrid_cv|/data/cubrid_cv|dev_process,history,issue,...|plan/**/*.html"
+```
+
+`scripts/embed_html_pages.py` then copies each matching document (plus the
+assets next to it) into `public/embed/<tree>/…` and writes a `<stem>-html.mdx`
+page that mounts `src/components/HtmlEmbed.astro`. Fragments (no `<html>`
+root) and build templates (`template.html`, `*-template.html`) are skipped;
+every decision is logged by `prebuild.sh`, so `npm run refresh` tells you
+what was embedded and what was passed over.
+
+Two things to know: the iframe is opaque to Pagefind, so an embedded
+document's text is not in the site search (its page title is); and it renders
+in its own theme, which follows the OS rather than Starlight's theme toggle.
+
 ## Design
 
 Matches the editorial palette of the sibling slides site:

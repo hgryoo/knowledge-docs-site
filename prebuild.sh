@@ -166,12 +166,16 @@ for proj in "${PROJECTS[@]}"; do
 done
 
 # Local-only trees. Driven by ./local-trees.conf (gitignored, per-machine).
-# Each entry: "<dest_under_local>|<abs_src>[|<comma_subdirs>]".
+# Each entry: "<dest_under_local>|<abs_src>[|<comma_subdirs>[|<html_globs>]]".
 # Missing src dirs are skipped silently, so CI hosts (where the file is
 # absent or paths don't exist) are unaffected.
 LOCAL_ROOT="$SCRIPT_DIR/src/content/docs/local"
 KO_LOCAL_ROOT="$SCRIPT_DIR/src/content/docs/ko/local"
-rm -rf "$LOCAL_ROOT" "$KO_LOCAL_ROOT"
+# Standalone HTML documents named by a tree's 4th conf field land here and
+# are served verbatim; scripts/embed_html_pages.py writes the .mdx pages
+# that mount them. Gitignored like the content trees above.
+EMBED_ROOT="$SCRIPT_DIR/public/embed"
+rm -rf "$LOCAL_ROOT" "$KO_LOCAL_ROOT" "$EMBED_ROOT"
 
 LOCAL_CONF="$SCRIPT_DIR/local-trees.conf"
 if [[ -f "$LOCAL_CONF" ]]; then
@@ -179,7 +183,7 @@ if [[ -f "$LOCAL_CONF" ]]; then
   # shellcheck source=/dev/null
   source "$LOCAL_CONF"
   for entry in "${LOCAL_TREES[@]}"; do
-    IFS='|' read -r dest src subdirs <<< "$entry"
+    IFS='|' read -r dest src subdirs html_globs <<< "$entry"
     if [[ -z "$dest" || -z "$src" ]]; then
       echo "WARN: malformed LOCAL_TREES entry: $entry" >&2
       continue
@@ -239,10 +243,34 @@ if [[ -f "$LOCAL_CONF" ]]; then
     else
       rm -rf "$ko_dest_full"
     fi
+
+    # Standalone HTML documents (4th conf field, e.g. the pandoc-built
+    # plan/lock_manager/book/book.html). The rsync filters above are
+    # markdown+figures only, so these need their own copy into public/ plus a
+    # generated .mdx page to mount them — see scripts/embed_html_pages.py.
+    # Runs last: the KO branch may have just dropped $ko_dest_full, and the
+    # stub writer recreates only what it needs.
+    if [[ -n "${html_globs:-}" ]]; then
+      echo ">> embed HTML $dest  ←  $src  [$html_globs]"
+      html_label=title
+      if [[ "$dest" == cub_sys* || "$dest" == cubrid_cv* ]]; then
+        html_label=filename
+      fi
+      ko_content_arg=()
+      if [[ -d "$ko_dest_full" ]]; then
+        ko_content_arg=(--ko-content "$ko_dest_full")
+      fi
+      python3 "$SCRIPT_DIR/scripts/embed_html_pages.py" \
+        --src "$src" --subdirs "${subdirs:-}" --patterns "$html_globs" \
+        --content "$dest_full" "${ko_content_arg[@]}" \
+        --public "$EMBED_ROOT/$dest" --url-prefix "embed/$dest" \
+        --sidebar-label "$html_label"
+    fi
   done
 fi
 
 en_count=$(find "$SCRIPT_DIR/src/content/docs/code-analysis" -type f -name '*.md' | wc -l)
 ko_count=$(find "$SCRIPT_DIR/src/content/docs/ko/code-analysis" -type f -name '*.md' 2>/dev/null | wc -l || echo 0)
 local_count=$(find "$LOCAL_ROOT" -type f -name '*.md' 2>/dev/null | wc -l || echo 0)
-echo "prebuild: en=$en_count md, ko=$ko_count md, local=$local_count md"
+embed_count=$(find "$LOCAL_ROOT" -type f -name '*-html.mdx' 2>/dev/null | wc -l || echo 0)
+echo "prebuild: en=$en_count md, ko=$ko_count md, local=$local_count md, embed=$embed_count html"

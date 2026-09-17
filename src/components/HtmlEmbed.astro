@@ -1,0 +1,96 @@
+---
+// Renders a standalone HTML document (served verbatim from public/) inside
+// the Starlight main panel: a slim toolbar with the file name and an
+// open-in-new-tab escape hatch, above a viewport-height iframe.
+//
+// Both the copy into public/ and the .mdx page that mounts this component
+// are produced by scripts/embed_html_pages.py — see its module docstring.
+
+interface Props {
+  /** Path of the HTML file relative to the site root, e.g. "embed/x/y.html". */
+  src: string;
+  /** Accessible name for the frame. Defaults to the file name. */
+  title?: string;
+}
+
+const { src, title } = Astro.props;
+
+// BASE_URL is "/" locally and "/knowledge-docs-site/" on Pages; normalize
+// so the joined href is right under either.
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const href = `${base}/${src.replace(/^\/+/, '')}`;
+const name = src.split('/').pop() ?? src;
+---
+
+<div class="html-embed">
+  <div class="html-embed__bar">
+    <code class="html-embed__name">{name}</code>
+    <a class="html-embed__open" href={href} target="_blank" rel="noopener">
+      Open in new tab ↗
+    </a>
+  </div>
+  <iframe
+    class="html-embed__frame"
+    src={href}
+    title={title ?? name}
+    loading="lazy"
+  ></iframe>
+</div>
+
+<style is:global>
+  /* Embedded documents bring their own layout (the lock_manager book has a
+     300px chapter nav of its own), so give the main panel more room than the
+     45rem prose column. Unlayered, so it beats Starlight's own value. */
+  :root {
+    --sl-content-width: 72rem;
+  }
+</style>
+
+<style>
+  .html-embed {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+
+  .html-embed__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--sl-color-gray-6);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    font-size: 0.8rem;
+  }
+
+  .html-embed__name {
+    color: var(--sl-color-gray-2);
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .html-embed__open {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .html-embed__open:hover,
+  .html-embed__open:focus-visible {
+    color: var(--sl-color-accent);
+  }
+
+  .html-embed__frame {
+    width: 100%;
+    height: calc(100vh - 11rem);
+    min-height: 30rem;
+    border: 0;
+    display: block;
+    background: var(--sl-color-bg);
+  }
+</style>
