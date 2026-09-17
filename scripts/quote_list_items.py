@@ -15,10 +15,25 @@ already accepts `z.array(z.unknown())` for `sources`/`references`, so we
 just need the YAML to parse — quoting every plain item makes that
 guaranteed.
 
+Plain mapping values get the same treatment when they carry a `: `
+(mapping boundary), a ` #` (comment start — `persona: PR #7698 ...`
+silently truncates to `PR` and orphans the rest), or a continuation
+line.
+
 Items already in flow form (`{...}`, `[...]`) or already quoted
 (`'...'`, `"..."`) are left untouched. Sub-mapping items
 (`- key: value` on the same line, or `-` followed by an indented mapping)
 are left untouched too.
+
+A plain scalar may span several lines:
+
+    sources:
+      - code — src/base/lockfree_freelist.hpp, lockfree_hashmap.hpp,
+        src/thread/thread_lockfree_hash_map.hpp
+
+Quoting only the first line would leave the continuation dangling and
+break the parse, so continuation lines are folded into the one quoted
+scalar.
 
 We deliberately do NOT modify the shared sanitize_frontmatter.py — that
 file is kept verbatim with knowledge-base-site. This pass is a
@@ -41,6 +56,34 @@ def quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
 
 
+def indent_of(body: str) -> int:
+    return len(body) - len(body.lstrip())
+
+
+def fold_continuation(lines: list[str], start: int, end: int, indent: int) -> tuple[str, int]:
+    """Consume the plain-scalar continuation lines that follow ``start``.
+
+    Returns the folded text (empty when there is none) and the index of
+    the first line that is not part of the scalar.
+    """
+    parts = []
+    i = start
+    while i < end:
+        body = lines[i].rstrip("\n")
+        stripped = body.strip()
+        if not stripped:
+            break
+        if indent_of(body) <= indent:
+            break
+        if stripped == "-" or stripped.startswith("- "):
+            break
+        if KV_LIKE_RE.match(stripped):
+            break
+        parts.append(stripped)
+        i += 1
+    return " ".join(parts), i
+
+
 def process_frontmatter(text: str) -> tuple[str, int]:
     lines = text.splitlines(keepends=True)
     if not lines or lines[0].rstrip("\n") != "---":
@@ -53,8 +96,10 @@ def process_frontmatter(text: str) -> tuple[str, int]:
     if end is None:
         return text, 0
 
+    out = lines[:1]
     fixes = 0
-    for i in range(1, end):
+    i = 1
+    while i < end:
         raw = lines[i]
         if raw.endswith("\n"):
             body, nl = raw[:-1], "\n"
@@ -64,33 +109,44 @@ def process_frontmatter(text: str) -> tuple[str, int]:
         seq = SEQ_ITEM_RE.match(body)
         if seq:
             prefix, value = seq.group(1), seq.group(2)
-            if not value:
-                continue
-            if value.startswith(ALREADY_QUOTED_OR_FLOW):
-                continue
-            if KV_LIKE_RE.match(value):
+            if (
+                value
+                and not value.startswith(ALREADY_QUOTED_OR_FLOW)
                 # genuine `- key: value` mapping entry — leave alone
+                and not KV_LIKE_RE.match(value)
+            ):
+                tail, i = fold_continuation(lines, i + 1, end, indent_of(prefix))
+                out.append(f"{prefix}{quote(value + ' ' + tail if tail else value)}{nl}")
+                fixes += 1
                 continue
-            lines[i] = f"{prefix}{quote(value)}{nl}"
-            fixes += 1
+            out.append(raw)
+            i += 1
             continue
 
         kv = KV_LINE_RE.match(body)
         if kv:
             key, sep, value = kv.group(1), kv.group(2), kv.group(3)
-            if value.startswith(ALREADY_QUOTED_OR_FLOW):
-                continue
-            if value.startswith(BLOCK_SCALAR):
-                continue
-            # YAML treats `: ` inside an unquoted scalar as a mapping
-            # boundary, which crashes block-mapping parse. Quote
-            # defensively whenever the value contains it.
-            if ": " in value:
-                lines[i] = f"{key}{sep}{quote(value)}{nl}"
-                fixes += 1
-            continue
+            if not value.startswith(ALREADY_QUOTED_OR_FLOW) and not value.startswith(
+                BLOCK_SCALAR
+            ):
+                tail, next_i = fold_continuation(lines, i + 1, end, indent_of(body))
+                # `: ` inside an unquoted scalar is a mapping boundary and
+                # ` #` starts a comment — both crash the block-mapping
+                # parse. A continuation line has to be folded in, or the
+                # quote we add would close the scalar and leave it
+                # dangling. Quote defensively in all three cases.
+                if ": " in value or " #" in value or tail:
+                    merged = f"{value} {tail}" if tail else value
+                    out.append(f"{key}{sep}{quote(merged)}{nl}")
+                    fixes += 1
+                    i = next_i
+                    continue
 
-    return "".join(lines), fixes
+        out.append(raw)
+        i += 1
+
+    out.extend(lines[end:])
+    return "".join(out), fixes
 
 
 def main() -> int:
